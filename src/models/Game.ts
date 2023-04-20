@@ -1,7 +1,8 @@
 import createDomElement from "../helpers/createDomElement";
+import parseArray from "../helpers/parseArray";
 
-type directionType = 'top' | 'down' | 'left' | 'right'
-type gridItemType = number | null
+export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
+export type gridItemType = number | null
 export interface IGameData {
     size: number
     score: number
@@ -12,7 +13,7 @@ interface IGame extends IGameData {
     init: () => void
     addNewItem: () => gridItemType[]
     checkIsGameOver: () => boolean
-    merge: (direction: directionType) => gridItemType[]
+    merge: (direction: directionType) => void
 }
 
 export default class Game implements IGame {
@@ -48,16 +49,17 @@ export default class Game implements IGame {
     }
 
     init(): void {
-        const container = document.getElementById('container')!;
-
-        const grid = createDomElement({
-            classList: ['grid'],
-            parent: container,
-        })
-
         this._currentGrid = new Array(this.powSize).fill(null);
         this.addNewItem();
         console.log('this._currentGrid', this._currentGrid)
+        this.renderGrid();
+    }
+
+    renderGrid(): void {
+        const grid: HTMLElement = createDomElement({
+                classList: ['grid'],
+                parent: document.getElementById('container')!,
+            })
 
         this.currentGrid.forEach((item) => createDomElement({
             classList: ['grid-item'],
@@ -66,13 +68,24 @@ export default class Game implements IGame {
         }))
     }
 
+    makeMove(direction: directionType): void {
+        this.merge(direction);
+        this._currentGrid = this.addNewItem();
+        this.renderGrid();
+    }
+
     addNewItem(): gridItemType[] {
+        if (!this._currentGrid.some(item => item === null)) {
+            return this._currentGrid;
+        }
+
         const newItem: 2|4 = (Math.random() * (11 - 1) + 1) < 9 ? 2 : 4;
         const result = [...this._currentGrid];
 
         const addToRandomSlot = (): gridItemType[] => {
             const newIndex = Math.floor(Math.random() * (this.powSize + 1));
             if (result[newIndex] !== null) return addToRandomSlot();
+            console.log('gl', newIndex)
             result[newIndex] = newItem;
             return result;
         }
@@ -85,8 +98,10 @@ export default class Game implements IGame {
     }
 
     merge(direction: directionType): void {
-        console.log(direction);
-        return;
+        const matrix = parseArray({
+            source: this._currentGrid,
+            mode: ['ArrowUp', 'ArrowDown'].includes(direction) ? 'vertical' : 'horizontal',
+            size: this._size,
+        })
     }
-
 }

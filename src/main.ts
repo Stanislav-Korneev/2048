@@ -1,5 +1,5 @@
 import './style.css'
-import { IGameData } from "./models/Game";
+import {directionType, IGameData} from "./models/Game";
 import Game from "./models/Game";
 
 const settings: IGameData = {
@@ -11,3 +11,8 @@ const settings: IGameData = {
 const game = new Game(settings);
 
 game.init();
+
+document.addEventListener('keydown', e => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
+    game.makeMove(e.key as directionType);
+})
