@@ -1,19 +1,21 @@
 interface IPayload {
-    tagName?: string,
-    classList?: string[],
-    textContent?: string,
-    parent?: HTMLElement,
+    tagName?: string
+    id?: string
+    classList?: string[]
+    textContent?: string
+    parent?: HTMLElement
 }
 
-export default function createDomElement(payload: IPayload): HTMLElement {
-    const {
-        tagName = 'div',
-        classList = [],
-        textContent = '',
-        parent
-    } = payload;
+export default function createDomElement({
+     tagName = 'div',
+     id = '',
+     classList = [],
+     textContent = '',
+     parent,
+ }: IPayload): HTMLElement {
 
     const newEl: HTMLElement = document.createElement(tagName);
+    newEl.id = id;
     newEl.classList.add(...classList);
     newEl.textContent = textContent;
 
