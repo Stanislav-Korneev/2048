@@ -3,19 +3,18 @@ import {gridItemType} from "../models/Game";
 export default function collapseArray(payload: gridItemType[]): gridItemType[] {
     if (payload.every(item => item === null)) return payload;
 
-    const result = [...payload];
+    let result: gridItemType[] = [...payload];
 
-    while (result[0] === null) {
-        result.shift();
-        result.push(null);
+    result = result.filter(item => item !== null);
+
+    for (let i = 0; i < result.length; i++) {
+        if (!result[i] || result[i] !== result[i + 1]) continue;
+
+        result[i]! *= 2;
+        result.splice(i + 1, 1);
     }
 
-    result.forEach((item, index) => {
-        if (item && item === result[index - 1]) {
-            result[index - 1] = item * 2;
-            item = null;
-        }
-    })
+    while (result.length < payload.length) result.push(null);
 
     return result;
 }
