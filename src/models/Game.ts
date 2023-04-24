@@ -1,5 +1,7 @@
 import createDomElement from "../helpers/createDomElement";
 import parseArray from "../helpers/parseArray";
+import collapseArray from "../helpers/collapseArray";
+import uniteArrays from "../helpers/uniteArrays";
 
 export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
 export type gridItemType = number | null
@@ -50,7 +52,7 @@ export default class Game implements IGame {
                 bubbles: true,
                 detail: {
                     targetId: `grid-item-${index}`,
-                    newValue: `${value[index]}`,
+                    newValue: value[index]?.toString() ?? '',
                 }
             });
             el.dispatchEvent(event);
@@ -112,10 +114,17 @@ export default class Game implements IGame {
     }
 
     merge(direction: directionType): void {
-        const matrix = parseArray({
+
+        let matrix = parseArray({
             source: this.currentGrid,
-            mode: ['ArrowUp', 'ArrowDown'].includes(direction) ? 'vertical' : 'horizontal',
+            direction,
             size: this.size,
         })
+        matrix = matrix.map(item => collapseArray(item));
+        this.currentGrid = uniteArrays({
+            source: matrix,
+            direction,
+            size: this.size,
+        });
     }
 }
