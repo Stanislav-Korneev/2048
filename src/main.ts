@@ -22,3 +22,7 @@ document.addEventListener('grid-item-change', ((e: gridItemEventType) => {
     const target = document.getElementById(targetId);
     if (target) target.textContent = newValue;
 }) as EventListener)
+
+document.getElementById('back-button')?.addEventListener('click', () => {
+    game.updateHistory('pop');
+})

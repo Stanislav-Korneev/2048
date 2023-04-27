@@ -6,10 +6,13 @@ import uniteArrays from "../helpers/uniteArrays";
 export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
 export type gridItemType = number | null
 export type gridItemEventType = CustomEvent<{targetId: string, newValue: string}>
+type historyMethodType = 'push' | 'pop'
+
 export interface IGameData {
     size: number
     score: number
     currentGrid: gridItemType[]
+    history: gridItemType[][]
 }
 
 interface IGame extends IGameData {
@@ -23,11 +26,14 @@ export default class Game implements IGame {
     private readonly _size: number
     private _score: number
     private _currentGrid: gridItemType[]
+    private _history: gridItemType[][]
 
     constructor(settings: IGameData) {
         this._score = settings.score;
         this._currentGrid = settings.currentGrid;
         this._size = settings.size;
+
+        this._history = JSON.parse(localStorage.getItem('game2048') ?? '[]');
     }
 
     get size(): number {
@@ -61,6 +67,14 @@ export default class Game implements IGame {
         this._currentGrid = value;
     }
 
+    get history(): gridItemType[][] {
+        return this._history;
+    }
+    set history(value: gridItemType[][]) {
+        this._history = value;
+        localStorage.setItem('game2048', JSON.stringify(this._history));
+    }
+
     get powSize(): number {
         return Math.pow(this.size, 2);
     }
@@ -89,6 +103,7 @@ export default class Game implements IGame {
     makeMove(direction: directionType): void {
         this.merge(direction);
         this.addNewItem();
+        this.updateHistory('push');
     }
 
     addNewItem(): gridItemType[] {
@@ -114,17 +129,29 @@ export default class Game implements IGame {
     }
 
     merge(direction: directionType): void {
-
         let matrix = parseArray({
             source: this.currentGrid,
             direction,
             size: this.size,
         })
+
         matrix = matrix.map(item => collapseArray(item));
+
         this.currentGrid = uniteArrays({
             source: matrix,
             direction,
             size: this.size,
         });
+    }
+
+    updateHistory(method: historyMethodType): void {
+        if (method === 'push') {
+            this._history.push(this.currentGrid);
+        }
+        if (method === 'pop' && this._history.length > 1) {
+            this._history.pop();
+            this.currentGrid = this._history[this._history.length - 1];
+        }
+        localStorage.setItem('game2048', JSON.stringify(this._history));
     }
 }
