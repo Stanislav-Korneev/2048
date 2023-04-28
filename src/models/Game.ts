@@ -13,14 +13,12 @@ export type historyItemType = {
 }
 type historyMethodType = 'push' | 'pop'
 
-export interface IGameData {
+interface IGame {
     size: number
     score: number
     currentGrid: gridItemType[]
     history: historyItemType[]
-}
 
-interface IGame extends IGameData {
     init: () => void
     addNewItem: () => gridItemType[]
     checkIsGameOver: () => boolean
@@ -33,10 +31,10 @@ export default class Game implements IGame {
     private _currentGrid: gridItemType[]
     private _history: historyItemType[]
 
-    constructor(settings: IGameData) {
+    constructor() {
+        this._size = 5;
         this._score = -1;
-        this._currentGrid = settings.currentGrid;
-        this._size = settings.size;
+        this._currentGrid = [];
         this._history = [];
     }
 

@@ -1,13 +1,6 @@
 import './style.css'
-import {directionType, gridItemEventType, IGameData, scoreEventType} from "./models/Game";
 import Game from "./models/Game";
-
-const settings: IGameData = {
-    size: 5,
-    score: 0,
-    currentGrid: []
-}
-
+import {directionType, gridItemEventType, scoreEventType} from "./models/Game";
 
 document.addEventListener('keydown', e => {
     if (!['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
@@ -30,5 +23,5 @@ document.getElementById('back-button')?.addEventListener('click', () => {
     game.updateHistory('pop');
 })
 
-const game = new Game(settings);
+const game = new Game();
 game.init();
