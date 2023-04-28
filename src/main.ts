@@ -1,5 +1,5 @@
 import './style.css'
-import {directionType, gridItemEventType, IGameData} from "./models/Game";
+import {directionType, gridItemEventType, IGameData, scoreEventType} from "./models/Game";
 import Game from "./models/Game";
 
 const settings: IGameData = {
@@ -8,9 +8,6 @@ const settings: IGameData = {
     currentGrid: []
 }
 
-const game = new Game(settings);
-
-game.init();
 
 document.addEventListener('keydown', e => {
     if (!['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
@@ -23,6 +20,15 @@ document.addEventListener('grid-item-change', ((e: gridItemEventType) => {
     if (target) target.textContent = newValue;
 }) as EventListener)
 
+document.addEventListener('score-change', ((e: scoreEventType) => {
+    console.log('listening score, ', e)
+    const target = document.getElementById('score');
+    if (target) target.textContent = `score: ${ e.detail.newScore }`;
+}) as EventListener)
+
 document.getElementById('back-button')?.addEventListener('click', () => {
     game.updateHistory('pop');
 })
+
+const game = new Game(settings);
+game.init();

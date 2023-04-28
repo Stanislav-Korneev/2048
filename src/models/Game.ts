@@ -6,34 +6,38 @@ import uniteArrays from "../helpers/uniteArrays";
 export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
 export type gridItemType = number | null
 export type gridItemEventType = CustomEvent<{targetId: string, newValue: string}>
+export type scoreEventType = CustomEvent<{newScore: number}>
+export type historyItemType = {
+    grid: gridItemType[]
+    score: number
+}
 type historyMethodType = 'push' | 'pop'
 
 export interface IGameData {
     size: number
     score: number
     currentGrid: gridItemType[]
-    history: gridItemType[][]
+    history: historyItemType[]
 }
 
 interface IGame extends IGameData {
     init: () => void
     addNewItem: () => gridItemType[]
     checkIsGameOver: () => boolean
-    merge: (direction: directionType) => void
+    merge: (direction: directionType) => historyItemType
 }
 
 export default class Game implements IGame {
     private readonly _size: number
     private _score: number
     private _currentGrid: gridItemType[]
-    private _history: gridItemType[][]
+    private _history: historyItemType[]
 
     constructor(settings: IGameData) {
-        this._score = settings.score;
+        this._score = -1;
         this._currentGrid = settings.currentGrid;
         this._size = settings.size;
-
-        this._history = JSON.parse(localStorage.getItem('game2048') ?? '[]');
+        this._history = [];
     }
 
     get size(): number {
@@ -43,13 +47,22 @@ export default class Game implements IGame {
         return this._score;
     }
     set score(value: number) {
-        if (value < 0) return;
+        console.log('set score, ', value);
+        if (value < 0 || this._score === value) return;
         this._score = value;
+        const event: scoreEventType = new CustomEvent('score-change', {
+            bubbles: true,
+            detail: {
+                newScore: this._score,
+            }
+        })
+        document.dispatchEvent(event);
     }
     get currentGrid(): gridItemType[] {
         return this._currentGrid;
     }
     set currentGrid(value: gridItemType[]) {
+        console.log('set currentGrid, ', value);
         const el = document.getElementById('grid')!;
         this._currentGrid.forEach((item, index) => {
             if (!el || item === value[index]) return;
@@ -67,10 +80,11 @@ export default class Game implements IGame {
         this._currentGrid = value;
     }
 
-    get history(): gridItemType[][] {
+    get history(): historyItemType[] {
         return this._history;
     }
-    set history(value: gridItemType[][]) {
+    set history(value: historyItemType[]) {
+        console.log('set history, ', value);
         this._history = value;
         localStorage.setItem('game2048', JSON.stringify(this._history));
     }
@@ -80,17 +94,21 @@ export default class Game implements IGame {
     }
 
     init(): void {
-        this.currentGrid = new Array(this.powSize).fill(null);
-        this.addNewItem();
+        const savedData = JSON.parse(localStorage.getItem('game2048') ?? '[]');
+        const { grid, score } = savedData[savedData.length - 1] ?? {};
+        this.currentGrid = grid ?? new Array(this.powSize).fill(null);
+        this.score = score ?? 0;
+
+        if (!grid) this.addNewItem();
         this.renderGrid();
     }
 
     renderGrid(): void {
         const grid: HTMLElement = createDomElement({
-                classList: ['grid'],
-                id: 'grid',
-                parent: document.getElementById('container')!,
-            })
+            classList: ['grid'],
+            id: 'grid',
+            parent: document.getElementById('container')!,
+        })
 
         this.currentGrid.forEach((item, index) => createDomElement({
             classList: ['grid-item'],
@@ -101,7 +119,10 @@ export default class Game implements IGame {
     }
 
     makeMove(direction: directionType): void {
-        this.merge(direction);
+        const { grid, score } = this.merge(direction);
+        this.score += score;
+        this.currentGrid = grid;
+
         this.addNewItem();
         this.updateHistory('push');
     }
@@ -128,29 +149,44 @@ export default class Game implements IGame {
         return !this.currentGrid.find(item => item === null);
     }
 
-    merge(direction: directionType): void {
+    merge(direction: directionType): historyItemType {
+        let scoreAccumulator = 0;
         let matrix = parseArray({
             source: this.currentGrid,
             direction,
             size: this.size,
         })
 
-        matrix = matrix.map(item => collapseArray(item));
+        matrix.forEach((item, index) => {
+            const { grid, score } = collapseArray(item);
+            matrix[index] = grid;
+            scoreAccumulator += score;
+        });
 
-        this.currentGrid = uniteArrays({
+        const grid = uniteArrays({
             source: matrix,
             direction,
             size: this.size,
         });
+
+        return {
+            grid,
+            score: scoreAccumulator,
+        };
     }
 
     updateHistory(method: historyMethodType): void {
         if (method === 'push') {
-            this._history.push(this.currentGrid);
+            this._history.push({
+                grid: this.currentGrid,
+                score: this.score,
+            });
         }
         if (method === 'pop' && this._history.length > 1) {
             this._history.pop();
-            this.currentGrid = this._history[this._history.length - 1];
+            const { grid, score } = this._history[this._history.length - 1];
+            this.currentGrid = grid;
+            this.score = score;
         }
         localStorage.setItem('game2048', JSON.stringify(this._history));
     }
