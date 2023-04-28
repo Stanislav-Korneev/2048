@@ -2,11 +2,10 @@ import createDomElement from "../helpers/createDomElement";
 import parseArray from "../helpers/parseArray";
 import collapseArray from "../helpers/collapseArray";
 import uniteArrays from "../helpers/uniteArrays";
+import { createEvent } from "../helpers/eventsController";
 
 export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
 export type gridItemType = number | null
-export type gridItemEventType = CustomEvent<{targetId: string, newValue: string}>
-export type scoreEventType = CustomEvent<{newScore: number}>
 export type historyItemType = {
     grid: gridItemType[]
     score: number
@@ -48,31 +47,28 @@ export default class Game implements IGame {
         console.log('set score, ', value);
         if (value < 0 || this._score === value) return;
         this._score = value;
-        const event: scoreEventType = new CustomEvent('score-change', {
-            bubbles: true,
+
+        createEvent({
+            type: 'score-change',
             detail: {
                 newScore: this._score,
             }
         })
-        document.dispatchEvent(event);
     }
     get currentGrid(): gridItemType[] {
         return this._currentGrid;
     }
     set currentGrid(value: gridItemType[]) {
-        console.log('set currentGrid, ', value);
-        const el = document.getElementById('grid')!;
-        this._currentGrid.forEach((item, index) => {
-            if (!el || item === value[index]) return;
-
-            const event: gridItemEventType = new CustomEvent('grid-item-change', {
-                bubbles: true,
+        this.currentGrid.forEach((item, index) => {
+            if (item === value[index]) return;
+            createEvent({
+                nodeId: 'grid',
+                type: 'grid-item-change',
                 detail: {
                     targetId: `grid-item-${index}`,
                     newValue: value[index]?.toString() ?? '',
                 }
-            });
-            el.dispatchEvent(event);
+            })
         })
 
         this._currentGrid = value;
