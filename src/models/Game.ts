@@ -93,6 +93,13 @@ export default class Game implements IGame {
         this.renderGrid();
     }
 
+    initNewGame(): void {
+        this.currentGrid = new Array(this.powSize).fill(null);
+        this.score = 0;
+        this.history = [];
+        this.makeMove('ArrowDown');
+    }
+
     renderGrid(): void {
         const grid: HTMLElement = createDomElement({
             classList: ['grid'],

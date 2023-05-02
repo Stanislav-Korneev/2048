@@ -23,15 +23,17 @@ export function createEvent({ nodeId = '', type, detail }: createEventPayloadTyp
 }
 
 export function initiateListeners(game: Game): void {
-    const backButton = document.getElementById('back-button');
-
     document.addEventListener('keydown', (e: KeyboardEvent) => keydownHandler({ e, game }));
 
     document.addEventListener('grid-change', ((e: gridChangeType) => gridItemChangeHandler(e)) as EventListener);
 
     document.addEventListener('score-change', ((e: scoreType) => scoreChangeHandler(e)) as EventListener);
 
+    const backButton = document.getElementById('back-button');
     backButton?.addEventListener('click', () => backButtonHandler(game));
+
+    const newGameButton = document.getElementById('new-game-button');
+    newGameButton?.addEventListener('click', () => newGameButtonHandler(game));
 }
 
 function keydownHandler({ e, game }: { e: KeyboardEvent, game: Game }): void {
@@ -54,4 +56,8 @@ function scoreChangeHandler(e: scoreType): void {
 
 function backButtonHandler(game: Game): void {
     game.updateHistory();
+}
+
+function newGameButtonHandler(game: Game): void {
+    game.initNewGame();
 }
