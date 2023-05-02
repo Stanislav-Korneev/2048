@@ -1,14 +1,14 @@
-import Game, { directionType } from "../models/Game";
+import Game, {directionType, gridItemType} from "../models/Game";
 
-type gridItemEventDetailType = { targetId: string, newValue: string }
-type scoreEventDetailType = { newScore: number }
-type gridItemEventType = CustomEvent<gridItemEventDetailType>
-type scoreEventType = CustomEvent<scoreEventDetailType>
+type gridChangeDetailType = { newGrid: gridItemType[] }
+type scoreDetailType = { newScore: number }
+type gridChangeType = CustomEvent<gridChangeDetailType>
+type scoreType = CustomEvent<scoreDetailType>
 
 type createEventPayloadType = {
     nodeId?: string
     type: string
-    detail: gridItemEventDetailType | scoreEventDetailType
+    detail: gridChangeDetailType | scoreDetailType
 }
 
 export function createEvent({ nodeId = '', type, detail }: createEventPayloadType): void {
@@ -27,9 +27,9 @@ export function initiateListeners(game: Game): void {
 
     document.addEventListener('keydown', (e: KeyboardEvent) => keydownHandler({ e, game }));
 
-    document.addEventListener('grid-item-change', ((e: gridItemEventType) => gridItemChangeHandler(e)) as EventListener);
+    document.addEventListener('grid-change', ((e: gridChangeType) => gridItemChangeHandler(e)) as EventListener);
 
-    document.addEventListener('score-change', ((e: scoreEventType) => scoreChangeHandler(e)) as EventListener);
+    document.addEventListener('score-change', ((e: scoreType) => scoreChangeHandler(e)) as EventListener);
 
     backButton?.addEventListener('click', () => backButtonHandler(game));
 }
@@ -39,13 +39,15 @@ function keydownHandler({ e, game }: { e: KeyboardEvent, game: Game }): void {
     game.makeMove(e.key as directionType);
 }
 
-function gridItemChangeHandler(e: gridItemEventType): void {
-    const { targetId, newValue } = e.detail;
-    const target = document.getElementById(targetId);
-    if (target) target.textContent = newValue;
+function gridItemChangeHandler(e: gridChangeType): void {
+    const { newGrid } = e.detail;
+    const gridNodes = document.querySelectorAll('.grid-item');
+    gridNodes.forEach((item, index) => {
+        item.textContent = `${newGrid[index] ?? ''}`;
+    });
 }
 
-function scoreChangeHandler(e: scoreEventType): void {
+function scoreChangeHandler(e: scoreType): void {
     const target = document.getElementById('score');
     if (target) target.textContent = `score: ${ e.detail.newScore }`;
 }

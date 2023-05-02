@@ -44,14 +44,13 @@ export default class Game implements IGame {
         return this._score;
     }
     set score(value: number) {
-        console.log('set score, ', value);
         if (value < 0 || this._score === value) return;
         this._score = value;
 
         createEvent({
             type: 'score-change',
             detail: {
-                newScore: this._score,
+                newScore: value,
             }
         })
     }
@@ -59,26 +58,21 @@ export default class Game implements IGame {
         return this._currentGrid;
     }
     set currentGrid(value: gridItemType[]) {
-        this.currentGrid.forEach((item, index) => {
-            if (item === value[index]) return;
-            createEvent({
-                nodeId: 'grid',
-                type: 'grid-item-change',
-                detail: {
-                    targetId: `grid-item-${index}`,
-                    newValue: value[index]?.toString() ?? '',
-                }
-            })
-        })
-
         this._currentGrid = value;
+
+        createEvent({
+            nodeId: 'grid',
+            type: 'grid-change',
+            detail: {
+                newGrid: value,
+            }
+        })
     }
 
     get history(): historyItemType[] {
         return this._history;
     }
     set history(value: historyItemType[]) {
-        console.log('set history, ', value);
         this._history = value;
         localStorage.setItem('game2048', JSON.stringify(this._history));
     }
