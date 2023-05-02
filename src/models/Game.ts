@@ -18,6 +18,7 @@ interface IGame {
     history: historyItemType[]
 
     init: () => void
+    initNewGame: () => void
     renderGrid: () => void
     makeMove: (direction: directionType) => void
     addNewItem: (grid: gridItemType[]) => gridItemType[]
