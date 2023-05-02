@@ -119,9 +119,11 @@ export default class Game implements IGame {
         const { grid, score } = this.merge(direction);
         this.score += score;
 
-        if (this.checkIsGameOver(grid)) return alert('game over');
         const gridHasChanges = grid.some((item, index) => item !== this.currentGrid[index]);
         if (!gridHasChanges) return;
+
+        if (this.checkIsGameOver(grid)) return alert('game over');
+        if (grid.find(item => item === 2048)) alert('you won!');
 
         this.currentGrid = this.addNewItem(grid);
         this.updateHistory({
