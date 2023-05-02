@@ -10,7 +10,6 @@ export type historyItemType = {
     grid: gridItemType[]
     score: number
 }
-type historyMethodType = 'push' | 'pop'
 
 interface IGame {
     size: number
@@ -19,9 +18,12 @@ interface IGame {
     history: historyItemType[]
 
     init: () => void
-    addNewItem: () => gridItemType[]
-    checkIsGameOver: () => boolean
+    renderGrid: () => void
+    makeMove: (direction: directionType) => void
+    addNewItem: (grid: gridItemType[]) => gridItemType[]
+    checkIsGameOver: (grid: gridItemType[]) => boolean
     merge: (direction: directionType) => historyItemType
+    updateHistory: (historyItem?: historyItemType) => void
 }
 
 export default class Game implements IGame {
@@ -87,7 +89,7 @@ export default class Game implements IGame {
         this.currentGrid = grid ?? new Array(this.powSize).fill(null);
         this.score = score ?? 0;
 
-        if (!grid) this.addNewItem();
+        if (!grid) this.makeMove('ArrowDown');
         this.renderGrid();
     }
 
@@ -109,32 +111,30 @@ export default class Game implements IGame {
     makeMove(direction: directionType): void {
         const { grid, score } = this.merge(direction);
         this.score += score;
-        this.currentGrid = grid;
+        if (this.checkIsGameOver(grid)) return alert('game over');
 
-        this.addNewItem();
-        this.updateHistory('push');
+        this.currentGrid = this.addNewItem(grid);
+        this.updateHistory({
+            grid: this.currentGrid,
+            score: this.score,
+        })
     }
 
-    addNewItem(): gridItemType[] {
-        if (!this.currentGrid.some(item => item === null)) {
-            return this.currentGrid;
-        }
-
+    addNewItem(grid: gridItemType[]): gridItemType[] {
         const newItem: 2|4 = (Math.random() * (11 - 1) + 1) < 9 ? 2 : 4;
-        const result = [...this.currentGrid];
+        const result = [...grid];
 
         const addToRandomSlot = (): gridItemType[] => {
             const newIndex = Math.floor(Math.random() * (this.powSize + 1));
             if (result[newIndex] !== null) return addToRandomSlot();
             result[newIndex] = newItem;
-            this.currentGrid = result;
             return result;
         }
         return addToRandomSlot();
     }
 
-    checkIsGameOver(): boolean {
-        return !this.currentGrid.find(item => item === null);
+    checkIsGameOver(grid: gridItemType[]): boolean {
+        return !grid.some(item => item === null);
     }
 
     merge(direction: directionType): historyItemType {
@@ -163,19 +163,18 @@ export default class Game implements IGame {
         };
     }
 
-    updateHistory(method: historyMethodType): void {
-        if (method === 'push') {
-            this._history.push({
-                grid: this.currentGrid,
-                score: this.score,
-            });
+    updateHistory(historyItem?: historyItemType): void {
+        if (historyItem) {
+            this._history.push(historyItem);
         }
-        if (method === 'pop' && this._history.length > 1) {
+
+        if (!historyItem && this._history.length > 1) {
             this._history.pop();
             const { grid, score } = this._history[this._history.length - 1];
             this.currentGrid = grid;
             this.score = score;
         }
+
         localStorage.setItem('game2048', JSON.stringify(this._history));
     }
 }

@@ -53,5 +53,5 @@ function scoreChangeHandler(e: scoreType): void {
 }
 
 function backButtonHandler(game: Game): void {
-    game.updateHistory('pop');
+    game.updateHistory();
 }
