@@ -103,11 +103,7 @@ export default class Game implements IGame {
     }
 
     renderGrid(): void {
-        const grid: HTMLElement = createDomElement({
-            classList: ['grid'],
-            id: 'grid',
-            parent: document.getElementById('container')!,
-        })
+        const grid = document.getElementById('grid')!;
 
         this.currentGrid.forEach((item, index) => createDomElement({
             classList: ['grid-item'],
