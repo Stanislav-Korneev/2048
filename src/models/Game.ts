@@ -22,7 +22,8 @@ interface IGame {
     renderGrid: () => void
     makeMove: (direction: directionType) => void
     addNewItem: (grid: gridItemType[]) => gridItemType[]
-    checkIsGameOver: (grid: gridItemType[]) => boolean
+    checkIsMovePossible: (grid: gridItemType[]) => boolean
+    checkIsGameEnd: (grid: gridItemType[]) => string | boolean
     merge: (direction: directionType) => historyItemType
     updateHistory: (historyItem?: historyItemType) => void
 }
@@ -120,13 +121,12 @@ export default class Game implements IGame {
         const { grid, score } = this.merge(direction);
         this.score += score;
 
-        const gridHasChanges = grid.some((item, index) => item !== this.currentGrid[index]);
-        if (!gridHasChanges) return;
+        if (!this.checkIsMovePossible(grid)) return;
 
-        if (this.checkIsGameOver(grid)) return alert('game over');
-        if (grid.find(item => item === 2048)) alert('you won!');
+        if (this.checkIsGameEnd(grid)) return alert(this.checkIsGameEnd(grid));
 
         this.currentGrid = this.addNewItem(grid);
+
         this.updateHistory({
             grid: this.currentGrid,
             score: this.score,
@@ -146,8 +146,16 @@ export default class Game implements IGame {
         return addToRandomSlot();
     }
 
-    checkIsGameOver(grid: gridItemType[]): boolean {
-        return !grid.some(item => item === null);
+    checkIsMovePossible(grid: gridItemType[]): boolean {
+        const isEmptyGrid = grid.every(item => item === null);
+        const gridHasChanges = grid.some((item, index) => item !== this.currentGrid[index]);
+        return (isEmptyGrid || gridHasChanges);
+    }
+
+    checkIsGameEnd(grid: gridItemType[]): string | boolean {
+        if (!grid.some(item => item === null)) return 'game over';
+        if (grid.find(item => item === 2048)) return 'you won';
+        return false;
     }
 
     merge(direction: directionType): historyItemType {
