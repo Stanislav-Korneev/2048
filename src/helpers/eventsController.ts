@@ -1,14 +1,17 @@
 import Game, {directionType, gridItemType} from "../models/Game";
+import swipeController from "./swipeController";
 
 type gridChangeDetailType = { newGrid: gridItemType[] }
 type scoreDetailType = { newScore: number }
+type initiateMoveDetailType = { direction: directionType }
 type gridChangeType = CustomEvent<gridChangeDetailType>
 type scoreType = CustomEvent<scoreDetailType>
+type initiateMoveType = CustomEvent<initiateMoveDetailType>
 
 type createEventPayloadType = {
     nodeId?: string
     type: string
-    detail: gridChangeDetailType | scoreDetailType
+    detail: gridChangeDetailType | scoreDetailType | initiateMoveDetailType
 }
 
 export function createEvent({ nodeId = '', type, detail }: createEventPayloadType): void {
@@ -23,11 +26,16 @@ export function createEvent({ nodeId = '', type, detail }: createEventPayloadTyp
 }
 
 export function initiateListeners(game: Game): void {
-    document.addEventListener('keydown', (e: KeyboardEvent) => keydownHandler({ e, game }));
+    document.addEventListener('keydown', (e: KeyboardEvent) => keydownHandler(e));
+
+    document.addEventListener('initiate-move', ((e: initiateMoveType) => initiateMoveHandler({ e, game })) as EventListener);
 
     document.addEventListener('grid-change', ((e: gridChangeType) => gridItemChangeHandler(e)) as EventListener);
 
     document.addEventListener('score-change', ((e: scoreType) => scoreChangeHandler(e)) as EventListener);
+
+    const grid = document.getElementById('grid')!;
+    swipeController(grid);
 
     const backButton = document.getElementById('back-button');
     backButton?.addEventListener('click', () => backButtonHandler(game));
@@ -36,9 +44,18 @@ export function initiateListeners(game: Game): void {
     newGameButton?.addEventListener('click', () => newGameButtonHandler(game));
 }
 
-function keydownHandler({ e, game }: { e: KeyboardEvent, game: Game }): void {
+function keydownHandler(e: KeyboardEvent): void {
     if (!['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
-    game.makeMove(e.key as directionType);
+    createEvent({
+        type: 'initiate-move',
+        detail: {
+            direction: e.key as directionType,
+        }
+    })
+}
+
+function initiateMoveHandler({ e, game }: { e: initiateMoveType, game: Game }): void {
+    game.makeMove(e.detail.direction);
 }
 
 function gridItemChangeHandler(e: gridChangeType): void {
