@@ -26,13 +26,13 @@ export function createEvent({ nodeId = '', type, detail }: createEventPayloadTyp
 }
 
 export function initiateListeners(game: Game): void {
-    document.addEventListener('keydown', (e: KeyboardEvent) => keydownHandler(e));
+    document.addEventListener('keydown', keydownHandler);
 
     document.addEventListener('initiate-move', ((e: initiateMoveType) => initiateMoveHandler({ e, game })) as EventListener);
 
-    document.addEventListener('grid-change', ((e: gridChangeType) => gridItemChangeHandler(e)) as EventListener);
+    document.addEventListener('grid-change', gridItemChangeHandler as EventListener);
 
-    document.addEventListener('score-change', ((e: scoreType) => scoreChangeHandler(e)) as EventListener);
+    document.addEventListener('score-change', scoreChangeHandler as EventListener);
 
     const grid = document.getElementById('grid')!;
     swipeController(grid);
