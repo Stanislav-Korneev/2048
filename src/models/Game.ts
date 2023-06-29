@@ -62,15 +62,17 @@ export default class Game implements IGame {
         return this._currentGrid;
     }
     set currentGrid(value: gridItemType[]) {
-        this._currentGrid = value;
 
         createEvent({
             nodeId: 'grid',
             type: 'grid-change',
             detail: {
+                oldGrid: this._currentGrid,
                 newGrid: value,
             }
         })
+
+        this._currentGrid = value;
     }
 
     get history(): historyItemType[] {
@@ -105,6 +107,14 @@ export default class Game implements IGame {
     renderGrid(): void {
         const grid = document.getElementById('grid')!;
 
+        const gridBackdrop = document.getElementById('grid-backdrop')!;
+
+        this.currentGrid.forEach(() => createDomElement({
+            classList: ['grid-item-backdrop'],
+            textContent: '',
+            parent: gridBackdrop,
+        }))
+
         this.currentGrid.forEach((item, index) => createDomElement({
             classList: ['grid-item'],
             id: `grid-item-${index}`,
@@ -120,6 +130,8 @@ export default class Game implements IGame {
         if (!this.checkIsMovePossible(grid)) return;
 
         if (this.checkIsGameEnd(grid)) return alert(this.checkIsGameEnd(grid));
+
+        this.currentGrid = grid;
 
         this.currentGrid = this.addNewItem(grid);
 
@@ -160,7 +172,7 @@ export default class Game implements IGame {
             source: this.currentGrid,
             direction,
             size: this.size,
-        })
+        });
 
         matrix.forEach((item, index) => {
             const { grid, score } = collapseArray(item);
@@ -172,7 +184,7 @@ export default class Game implements IGame {
             source: matrix,
             direction,
             size: this.size,
-        });
+        }) as gridItemType[];
 
         return {
             grid,

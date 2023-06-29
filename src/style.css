@@ -26,18 +26,27 @@ body {
   width: 100%;
 }
 
+.grid-container {
+  position: relative;
+}
+
 .grid {
+  z-index: 1;
+  position: relative;
   max-width: 370px;
   display: grid;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  /*display: flex;*/
-  /*flex-wrap: wrap;*/
   gap: 4px;
-  background-color: rgba(255, 255, 255, 0.87);
 }
 
-.grid-item {
+.grid-backdrop {
+  position: absolute;
+  background-color: aliceblue;
+}
+
+.grid-item,
+.grid-item-backdrop {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -45,3 +54,28 @@ body {
   height: 70px;
   background-color: burlywood;
 }
+
+.grid-item {
+  z-index: 10;
+}
+
+.color-2 {
+  background-color: dimgrey;
+}
+.color-4 {
+  background-color: darkgray;
+}
+.color-8 {
+  background-color: cadetblue;
+}
+.color-16 {
+  background-color: coral;
+}
+.color-32 {
+  background-color: cornflowerblue;
+}
+
+.color-null {
+  background-color: black;
+}
+

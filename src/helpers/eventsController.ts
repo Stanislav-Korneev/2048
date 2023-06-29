@@ -1,7 +1,8 @@
 import Game, {directionType, gridItemType} from "../models/Game";
 import swipeController from "./swipeController";
+import handleAnimation from "./handleAnimation";
 
-type gridChangeDetailType = { newGrid: gridItemType[] }
+type gridChangeDetailType = { oldGrid: gridItemType[], newGrid: gridItemType[] }
 type scoreDetailType = { newScore: number }
 type initiateMoveDetailType = { direction: directionType }
 type gridChangeType = CustomEvent<gridChangeDetailType>
@@ -15,7 +16,7 @@ type createEventPayloadType = {
 }
 
 export function createEvent({ nodeId = '', type, detail }: createEventPayloadType): void {
-    const eventNode = document.getElementById(nodeId) ?? document;
+    const eventNode = nodeId ? document.getElementById(nodeId) : document;
 
     const event: CustomEvent<typeof detail>= new CustomEvent(type, {
         bubbles: true,
@@ -55,15 +56,26 @@ function keydownHandler(e: KeyboardEvent): void {
 }
 
 function initiateMoveHandler({ e, game }: { e: initiateMoveType, game: Game }): void {
+    localStorage.setItem('game2048Direction', e.detail.direction);
     game.makeMove(e.detail.direction);
 }
 
 function gridItemChangeHandler(e: gridChangeType): void {
-    const { newGrid } = e.detail;
-    const gridNodes = document.querySelectorAll('.grid-item');
-    gridNodes.forEach((item, index) => {
-        item.textContent = `${newGrid[index] ?? ''}`;
+    const { oldGrid, newGrid } = e.detail;
+    const gridNodes: NodeListOf<HTMLDivElement> = document.querySelectorAll('.grid-item');
+    const direction = localStorage.getItem('game2048Direction') as directionType;
+    handleAnimation({
+        nodes: gridNodes,
+        oldGrid,
+        newGrid,
+        direction,
     });
+
+    setTimeout(() => {
+        gridNodes.forEach((item, index) => {
+            item.textContent = `${newGrid[index] ?? ''}`;
+        });
+    }, 2000)
 }
 
 function scoreChangeHandler(e: scoreType): void {
