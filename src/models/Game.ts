@@ -5,7 +5,7 @@ import uniteArrays from "../helpers/uniteArrays";
 import { createEvent } from "../helpers/eventsController";
 
 export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
-type currentDirectionType = directionType | ''
+export type currentDirectionType = directionType | 'historyRollBack' | ''
 export type gridItemType = number | null
 export type historyItemType = {
     grid: gridItemType[]
@@ -79,7 +79,7 @@ export default class Game implements IGame {
             detail: {
                 oldGrid: this._currentGrid,
                 newGrid: value,
-                direction: this.currentDirection as directionType,
+                direction: this.currentDirection,
                 gridSize: this.size,
             }
         })
@@ -211,6 +211,7 @@ export default class Game implements IGame {
         }
 
         if (!historyItem && this._history.length > 1) {
+            this.currentDirection = 'historyRollBack';
             this._history.pop();
             const { grid, score } = this._history[this._history.length - 1];
             this.currentGrid = grid;

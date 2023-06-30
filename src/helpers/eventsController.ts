@@ -1,8 +1,8 @@
-import Game, {directionType, gridItemType} from "../models/Game";
+import Game, {currentDirectionType, directionType, gridItemType} from "../models/Game";
 import swipeController from "./swipeController";
 import handleAnimation from "./handleAnimation";
 
-type gridChangeDetailType = { oldGrid: gridItemType[], newGrid: gridItemType[], direction: directionType, gridSize: number }
+type gridChangeDetailType = { oldGrid: gridItemType[], newGrid: gridItemType[], direction: currentDirectionType, gridSize: number }
 type scoreDetailType = { newScore: number }
 type initiateMoveDetailType = { direction: directionType }
 type gridChangeType = CustomEvent<gridChangeDetailType>
@@ -62,14 +62,21 @@ function initiateMoveHandler({ e, game }: { e: initiateMoveType, game: Game }): 
 function gridItemChangeHandler(e: gridChangeType): void {
     const { oldGrid, newGrid, direction, gridSize } = e.detail;
     const gridNodes: NodeListOf<HTMLDivElement> = document.querySelectorAll('.grid-item');
+
+    if (direction === 'historyRollBack' || direction === '') {
+        gridNodes.forEach((item, index) => {
+            item.textContent = `${newGrid[index] ?? ''}`;
+        });
+        return;
+    }
+
     handleAnimation({
         nodes: gridNodes,
         oldGrid,
         newGrid,
-        direction,
+        direction: direction as directionType,
         gridSize,
     });
-
     setTimeout(() => {
         gridNodes.forEach((item, index) => {
             item.textContent = `${newGrid[index] ?? ''}`;
