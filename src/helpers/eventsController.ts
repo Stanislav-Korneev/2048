@@ -2,7 +2,7 @@ import Game, {directionType, gridItemType} from "../models/Game";
 import swipeController from "./swipeController";
 import handleAnimation from "./handleAnimation";
 
-type gridChangeDetailType = { oldGrid: gridItemType[], newGrid: gridItemType[] }
+type gridChangeDetailType = { oldGrid: gridItemType[], newGrid: gridItemType[], direction: directionType }
 type scoreDetailType = { newScore: number }
 type initiateMoveDetailType = { direction: directionType }
 type gridChangeType = CustomEvent<gridChangeDetailType>
@@ -56,14 +56,12 @@ function keydownHandler(e: KeyboardEvent): void {
 }
 
 function initiateMoveHandler({ e, game }: { e: initiateMoveType, game: Game }): void {
-    localStorage.setItem('game2048Direction', e.detail.direction);
     game.makeMove(e.detail.direction);
 }
 
 function gridItemChangeHandler(e: gridChangeType): void {
-    const { oldGrid, newGrid } = e.detail;
+    const { oldGrid, newGrid, direction } = e.detail;
     const gridNodes: NodeListOf<HTMLDivElement> = document.querySelectorAll('.grid-item');
-    const direction = localStorage.getItem('game2048Direction') as directionType;
     handleAnimation({
         nodes: gridNodes,
         oldGrid,

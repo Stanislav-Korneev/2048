@@ -5,6 +5,7 @@ import uniteArrays from "../helpers/uniteArrays";
 import { createEvent } from "../helpers/eventsController";
 
 export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
+type currentDirectionType = directionType | ''
 export type gridItemType = number | null
 export type historyItemType = {
     grid: gridItemType[]
@@ -14,6 +15,7 @@ export type historyItemType = {
 interface IGame {
     size: number
     score: number
+    currentDirection: currentDirectionType
     currentGrid: gridItemType[]
     history: historyItemType[]
 
@@ -31,12 +33,14 @@ interface IGame {
 export default class Game implements IGame {
     private readonly _size: number
     private _score: number
+    private _currentDirection: currentDirectionType
     private _currentGrid: gridItemType[]
     private _history: historyItemType[]
 
     constructor() {
         this._size = 5;
         this._score = -1;
+        this._currentDirection = '';
         this._currentGrid = [];
         this._history = [];
     }
@@ -58,6 +62,12 @@ export default class Game implements IGame {
             }
         })
     }
+    get currentDirection(): currentDirectionType {
+        return this._currentDirection;
+    }
+    set currentDirection(value: currentDirectionType) {
+        this._currentDirection = value;
+    }
     get currentGrid(): gridItemType[] {
         return this._currentGrid;
     }
@@ -69,6 +79,7 @@ export default class Game implements IGame {
             detail: {
                 oldGrid: this._currentGrid,
                 newGrid: value,
+                direction: this.currentDirection as directionType,
             }
         })
 
@@ -124,6 +135,7 @@ export default class Game implements IGame {
     }
 
     makeMove(direction: directionType): void {
+        this.currentDirection = direction;
         const { grid, score } = this.merge(direction);
         this.score += score;
 
