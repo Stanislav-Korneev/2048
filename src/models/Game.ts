@@ -102,23 +102,23 @@ export default class Game implements IGame {
     init(): void {
         const savedData = JSON.parse(localStorage.getItem('game2048') ?? '[]');
         const { grid, score } = savedData[savedData.length - 1] ?? {};
+
         this.currentGrid = grid ?? new Array(this.powSize).fill(null);
+        if (!grid) this.currentGrid = this.addNewItem(this.currentGrid);
         this.score = score ?? 0;
 
-        if (!grid) this.makeMove('ArrowDown');
         this.renderGrid();
     }
 
     initNewGame(): void {
         this.currentGrid = new Array(this.powSize).fill(null);
+        this.currentGrid = this.addNewItem(this.currentGrid);
         this.score = 0;
         this.history = [];
-        this.makeMove('ArrowDown');
     }
 
     renderGrid(): void {
         const grid = document.getElementById('grid')!;
-
         const gridBackdrop = document.getElementById('grid-backdrop')!;
 
         this.currentGrid.forEach(() => createDomElement({
@@ -136,8 +136,8 @@ export default class Game implements IGame {
     }
 
     makeMove(direction: directionType): void {
-        this.currentDirection = direction;
         const { grid, score } = this.merge(direction);
+        this.currentDirection = direction;
         this.score += score;
 
         if (!this.checkIsMovePossible(grid)) return;
