@@ -2,7 +2,7 @@ import Game, {directionType, gridItemType} from "../models/Game";
 import swipeController from "./swipeController";
 import handleAnimation from "./handleAnimation";
 
-type gridChangeDetailType = { oldGrid: gridItemType[], newGrid: gridItemType[], direction: directionType }
+type gridChangeDetailType = { oldGrid: gridItemType[], newGrid: gridItemType[], direction: directionType, gridSize: number }
 type scoreDetailType = { newScore: number }
 type initiateMoveDetailType = { direction: directionType }
 type gridChangeType = CustomEvent<gridChangeDetailType>
@@ -60,13 +60,14 @@ function initiateMoveHandler({ e, game }: { e: initiateMoveType, game: Game }): 
 }
 
 function gridItemChangeHandler(e: gridChangeType): void {
-    const { oldGrid, newGrid, direction } = e.detail;
+    const { oldGrid, newGrid, direction, gridSize } = e.detail;
     const gridNodes: NodeListOf<HTMLDivElement> = document.querySelectorAll('.grid-item');
     handleAnimation({
         nodes: gridNodes,
         oldGrid,
         newGrid,
         direction,
+        gridSize,
     });
 
     setTimeout(() => {

@@ -80,6 +80,7 @@ export default class Game implements IGame {
                 oldGrid: this._currentGrid,
                 newGrid: value,
                 direction: this.currentDirection as directionType,
+                gridSize: this.size,
             }
         })
 

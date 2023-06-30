@@ -7,6 +7,7 @@ type handleAnimationPayloadType = {
     oldGrid: gridItemType[]
     newGrid: gridItemType[]
     direction: directionType
+    gridSize: number
 }
 
 type checkHasNewItemPayloadType = {
@@ -18,6 +19,7 @@ type getSwipeAnimationsPayloadType = {
     oldGrid: gridItemType[]
     newGrid: gridItemType[]
     direction: directionType
+    gridSize: number
 }
 
 type animateSlidePayloadType = {
@@ -31,7 +33,7 @@ export type animationType = {
     type: (`slide` | 'merge' | 'appear' | '')[],
 }
 
-export default function handleAnimation({nodes, oldGrid, newGrid, direction}:
+export default function handleAnimation({nodes, oldGrid, newGrid, direction, gridSize}:
     handleAnimationPayloadType): void {
 
     let animations: animationType[] = new Array(newGrid.length).fill(null).map(() => ({slideCount: 0, type: []}));
@@ -39,7 +41,7 @@ export default function handleAnimation({nodes, oldGrid, newGrid, direction}:
     const hasNewItem: boolean = checkHasNewItem({oldGrid, newGrid});
 
     if (!hasNewItem) {
-        animations = [...getSwipeAnimations({oldGrid, newGrid, direction})];
+        animations = [...getSwipeAnimations({oldGrid, newGrid, direction, gridSize})];
     }
 
     if (hasNewItem) {
@@ -64,16 +66,16 @@ function checkHasNewItem({oldGrid, newGrid}: checkHasNewItemPayloadType): boolea
     return filteredNewGrid.length - filteredOldGrid.length === 1;
 }
 
-function getSwipeAnimations({ oldGrid, newGrid, direction }: getSwipeAnimationsPayloadType): animationType[] {
+function getSwipeAnimations({ oldGrid, newGrid, direction, gridSize }: getSwipeAnimationsPayloadType): animationType[] {
     const oldMatrix: gridItemType[][] = parseArray({
         source: oldGrid,
         direction,
-        size: 5,
+        size: gridSize,
     })
     const newMatrix: gridItemType[][] = parseArray({
         source: newGrid,
         direction,
-        size: 5,
+        size: gridSize,
     })
     let slideAnimationsRows: animationType[][] = [];
 
@@ -114,7 +116,7 @@ function getSwipeAnimations({ oldGrid, newGrid, direction }: getSwipeAnimationsP
     return uniteArrays({
         source: slideAnimationsRows,
         direction,
-        size: 5,
+        size: gridSize,
     }) as animationType[];
 }
 
