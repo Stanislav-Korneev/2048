@@ -8,11 +8,7 @@ type handleAnimationPayloadType = {
     newGrid: gridItemType[]
     direction: directionType
     gridSize: number
-}
-
-type checkHasNewItemPayloadType = {
-    oldGrid: gridItemType[]
-    newGrid: gridItemType[]
+    newGridItemIndex: number
 }
 
 type getSwipeAnimationsPayloadType = {
@@ -33,20 +29,16 @@ export type animationType = {
     type: (`slide` | 'merge' | 'appear' | '')[],
 }
 
-export default function handleAnimation({nodes, oldGrid, newGrid, direction, gridSize}:
+export default function handleAnimation({nodes, oldGrid, newGrid, direction, gridSize, newGridItemIndex }:
     handleAnimationPayloadType): void {
 
-    let animations: animationType[] = new Array(newGrid.length).fill(null).map(() => ({slideCount: 0, type: []}));
+    const gridWithoutNewItem: gridItemType[] = [...newGrid].splice(newGridItemIndex, 1, null);
 
-    const hasNewItem: boolean = checkHasNewItem({oldGrid, newGrid});
+    const animations: animationType[] = [...getSwipeAnimations({oldGrid, newGrid: gridWithoutNewItem, direction, gridSize})];
 
-    if (!hasNewItem) {
-        animations = [...getSwipeAnimations({oldGrid, newGrid, direction, gridSize})];
-    }
-
-    if (hasNewItem) {
-        const targetIndex: number = newGrid.findIndex((item, index) => item !== oldGrid[index]);
-        animations[targetIndex].type.push('appear');
+    animations[newGridItemIndex] = {
+        slideCount: 0,
+        type: ['appear'],
     }
 
     animations.forEach((item, index) => {
@@ -58,12 +50,6 @@ export default function handleAnimation({nodes, oldGrid, newGrid, direction, gri
             slideCount: item.slideCount,
         });
     })
-}
-
-function checkHasNewItem({oldGrid, newGrid}: checkHasNewItemPayloadType): boolean {
-    const filteredOldGrid: gridItemType[] = oldGrid.filter(item => item !== null);
-    const filteredNewGrid: gridItemType[] = newGrid.filter(item => item !== null);
-    return filteredNewGrid.length - filteredOldGrid.length === 1;
 }
 
 function getSwipeAnimations({ oldGrid, newGrid, direction, gridSize }: getSwipeAnimationsPayloadType): animationType[] {

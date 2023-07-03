@@ -11,6 +11,10 @@ export type historyItemType = {
     grid: gridItemType[]
     score: number
 }
+type addNewItemType = {
+    newGrid: gridItemType[]
+    newGridItemIndex: number
+}
 
 interface IGame {
     size: number
@@ -23,11 +27,11 @@ interface IGame {
     initNewGame: () => void
     renderGrid: () => void
     makeMove: (direction: directionType) => void
-    addNewItem: (grid: gridItemType[]) => gridItemType[]
+    addNewItem: (grid: gridItemType[]) => addNewItemType
     checkIsMovePossible: (grid: gridItemType[]) => boolean
     checkIsGameEnd: (grid: gridItemType[]) => string | boolean
     merge: (direction: directionType) => historyItemType
-    updateHistory: (historyItem?: historyItemType) => void
+    rollBackMove: () => void
 }
 
 export default class Game implements IGame {
@@ -72,18 +76,6 @@ export default class Game implements IGame {
         return this._currentGrid;
     }
     set currentGrid(value: gridItemType[]) {
-
-        createEvent({
-            nodeId: 'grid',
-            type: 'grid-change',
-            detail: {
-                oldGrid: this._currentGrid,
-                newGrid: value,
-                direction: this.currentDirection,
-                gridSize: this.size,
-            }
-        })
-
         this._currentGrid = value;
     }
 
@@ -91,8 +83,15 @@ export default class Game implements IGame {
         return this._history;
     }
     set history(value: historyItemType[]) {
-        this._history = value;
+        this._history = value.slice(-3);
         localStorage.setItem('game2048', JSON.stringify(this._history));
+
+        createEvent({
+            type: 'back-button-switch',
+            detail: {
+                status: value.length > 0,
+            }
+        })
     }
 
     get powSize(): number {
@@ -104,7 +103,7 @@ export default class Game implements IGame {
         const { grid, score } = savedData[savedData.length - 1] ?? {};
 
         this.currentGrid = grid ?? new Array(this.powSize).fill(null);
-        if (!grid) this.currentGrid = this.addNewItem(this.currentGrid);
+        if (!grid) this.currentGrid = this.addNewItem(this.currentGrid).newGrid;
         this.score = score ?? 0;
 
         this.renderGrid();
@@ -112,7 +111,7 @@ export default class Game implements IGame {
 
     initNewGame(): void {
         this.currentGrid = new Array(this.powSize).fill(null);
-        this.currentGrid = this.addNewItem(this.currentGrid);
+        this.currentGrid = this.addNewItem(this.currentGrid).newGrid;
         this.score = 0;
         this.history = [];
     }
@@ -144,25 +143,36 @@ export default class Game implements IGame {
 
         if (this.checkIsGameEnd(grid)) return alert(this.checkIsGameEnd(grid));
 
-        this.currentGrid = grid;
+        const { newGrid, newGridItemIndex }: addNewItemType = this.addNewItem(grid);
+        createEvent({
+            nodeId: 'grid',
+            type: 'grid-change',
+            detail: {
+                oldGrid: this._currentGrid,
+                newGrid,
+                direction: this.currentDirection,
+                gridSize: this.size,
+                newGridItemIndex,
+            }
+        })
 
-        this.currentGrid = this.addNewItem(grid);
+        this.currentGrid = newGrid;
 
-        this.updateHistory({
+        this.history = [... this.history, {
             grid: this.currentGrid,
             score: this.score,
-        })
+        }];
     }
 
-    addNewItem(grid: gridItemType[]): gridItemType[] {
+    addNewItem(grid: gridItemType[]): addNewItemType {
         const newItem: 2|4 = (Math.random() * (11 - 1) + 1) < 9 ? 2 : 4;
         const result = [...grid];
 
-        const addToRandomSlot = (): gridItemType[] => {
+        const addToRandomSlot = (): addNewItemType => {
             const newIndex = Math.floor(Math.random() * (this.powSize + 1));
             if (result[newIndex] !== null) return addToRandomSlot();
             result[newIndex] = newItem;
-            return result;
+            return { newGrid: result , newGridItemIndex: newIndex};
         }
         return addToRandomSlot();
     }
@@ -205,19 +215,12 @@ export default class Game implements IGame {
         };
     }
 
-    updateHistory(historyItem?: historyItemType): void {
-        if (historyItem) {
-            this._history.push(historyItem);
-        }
+    rollBackMove(): void {
+        if (!this.history.length) return;
+        this.currentGrid = this.history[this.history.length - 1].grid;
 
-        if (!historyItem && this._history.length > 1) {
-            this.currentDirection = 'historyRollBack';
-            this._history.pop();
-            const { grid, score } = this._history[this._history.length - 1];
-            this.currentGrid = grid;
-            this.score = score;
-        }
-
-        localStorage.setItem('game2048', JSON.stringify(this._history));
+        const newHistoryEntry: historyItemType[] = [...this.history];
+        newHistoryEntry.pop();
+        this.history = [...newHistoryEntry];
     }
 }

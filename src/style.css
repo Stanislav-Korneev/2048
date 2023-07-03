@@ -26,6 +26,10 @@ body {
   width: 100%;
 }
 
+button:disabled {
+  background-color: lightgray;
+}
+
 .grid-container {
   position: relative;
 }

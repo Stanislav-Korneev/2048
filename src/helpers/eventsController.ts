@@ -2,25 +2,29 @@ import Game, {currentDirectionType, directionType, gridItemType} from "../models
 import swipeController from "./swipeController";
 import handleAnimation from "./handleAnimation";
 
-type gridChangeDetailType = { oldGrid: gridItemType[], newGrid: gridItemType[], direction: currentDirectionType, gridSize: number }
+type gridChangeDetailType = { oldGrid: gridItemType[], newGrid: gridItemType[], direction: currentDirectionType, gridSize: number, newGridItemIndex: number }
 type scoreDetailType = { newScore: number }
 type initiateMoveDetailType = { direction: directionType }
+type backButtonSwitchDetailType = { status: boolean }
+
 type gridChangeType = CustomEvent<gridChangeDetailType>
 type scoreType = CustomEvent<scoreDetailType>
 type initiateMoveType = CustomEvent<initiateMoveDetailType>
+type backButtonSwitchType = CustomEvent<backButtonSwitchDetailType>
 
 type createEventPayloadType = {
     nodeId?: string
-    type: string
-    detail: gridChangeDetailType | scoreDetailType | initiateMoveDetailType
+    type: 'grid-change' | 'score-change' | 'initiate-move' | 'back-button-switch'
+    detail: gridChangeDetailType | scoreDetailType | initiateMoveDetailType | backButtonSwitchDetailType
 }
 
 export function createEvent({ nodeId = '', type, detail }: createEventPayloadType): void {
-    const eventNode = nodeId ? document.getElementById(nodeId) : document;
+    const targetNode: HTMLElement | null = document.getElementById(nodeId as string);
+    const eventNode: HTMLElement | Document = targetNode ?? document;
 
-    const event: CustomEvent<typeof detail>= new CustomEvent(type, {
+    const event: CustomEvent<typeof detail> = new CustomEvent(type, {
         bubbles: true,
-        detail: detail,
+        detail,
     })
 
     eventNode.dispatchEvent(event);
@@ -34,6 +38,8 @@ export function initiateListeners(game: Game): void {
     document.addEventListener('grid-change', gridItemChangeHandler as EventListener);
 
     document.addEventListener('score-change', scoreChangeHandler as EventListener);
+
+    document.addEventListener('back-button-switch', backButtonSwitcher as EventListener);
 
     const grid = document.getElementById('grid')!;
     swipeController(grid);
@@ -60,7 +66,7 @@ function initiateMoveHandler({ e, game }: { e: initiateMoveType, game: Game }): 
 }
 
 function gridItemChangeHandler(e: gridChangeType): void {
-    const { oldGrid, newGrid, direction, gridSize } = e.detail;
+    const { oldGrid, newGrid, direction, gridSize, newGridItemIndex } = e.detail;
     const gridNodes: NodeListOf<HTMLDivElement> = document.querySelectorAll('.grid-item');
 
     if (direction === 'historyRollBack' || direction === '') {
@@ -76,6 +82,7 @@ function gridItemChangeHandler(e: gridChangeType): void {
         newGrid,
         direction: direction as directionType,
         gridSize,
+        newGridItemIndex,
     });
     setTimeout(() => {
         gridNodes.forEach((item, index) => {
@@ -90,7 +97,15 @@ function scoreChangeHandler(e: scoreType): void {
 }
 
 function backButtonHandler(game: Game): void {
-    game.updateHistory();
+    game.rollBackMove();
+}
+
+function backButtonSwitcher(e: backButtonSwitchType): void {
+    const { status } = e.detail;
+    const button = document.getElementById('back-button') as HTMLButtonElement;
+
+    if (!status) button.setAttribute('disabled', '');
+    if (status) button.removeAttribute('disabled');
 }
 
 function newGameButtonHandler(game: Game): void {
