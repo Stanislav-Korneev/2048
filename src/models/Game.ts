@@ -4,7 +4,7 @@ import collapseArray from "../helpers/collapseArray";
 import uniteArrays from "../helpers/uniteArrays";
 import { createEvent } from "../helpers/eventsController";
 
-export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
+export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'historyRollback'
 export type gridItemType = number | null
 export type historyItemType = {
     grid: gridItemType[]
@@ -206,7 +206,20 @@ export default class Game implements IGame {
 
     rollBackMove(): void {
         if (!this.history.length) return;
-        this.currentGrid = this.history[this.history.length - 1].grid;
+        const newGrid: gridItemType[] = this.history[this.history.length - 1].grid;
+
+        createEvent({
+            nodeId: 'grid',
+            type: 'grid-change',
+            detail: {
+                oldGrid: this._currentGrid,
+                newGrid,
+                direction: 'historyRollback',
+                gridSize: this.size,
+                newGridItemIndex: null,
+            }
+        })
+        this.currentGrid = newGrid;
 
         const newHistoryEntry: historyItemType[] = [...this.history];
         newHistoryEntry.pop();

@@ -11,6 +11,11 @@ type handleAnimationPayloadType = {
     newGridItemIndex: number
 }
 
+type setNewValuesPayloadType = {
+    nodes: NodeListOf<HTMLDivElement>
+    newGrid: gridItemType[]
+}
+
 type getSwipeAnimationsPayloadType = {
     oldGrid: gridItemType[]
     newGrid: gridItemType[]
@@ -32,6 +37,10 @@ export type animationType = {
 export default function handleAnimation({nodes, oldGrid, newGrid, direction, gridSize, newGridItemIndex }:
     handleAnimationPayloadType): void {
 
+    if (direction === 'historyRollback') {
+        return setNewValues({nodes, newGrid});
+    }
+
     const gridWithoutNewItem: gridItemType[] = [...newGrid].splice(newGridItemIndex, 1, null);
 
     const animations: animationType[] = [...getSwipeAnimations({oldGrid, newGrid: gridWithoutNewItem, direction, gridSize})];
@@ -50,6 +59,16 @@ export default function handleAnimation({nodes, oldGrid, newGrid, direction, gri
             slideCount: item.slideCount,
         });
     })
+
+    setTimeout(() => {
+        setNewValues({ nodes, newGrid })
+    }, 2000)
+}
+
+function setNewValues({nodes, newGrid}: setNewValuesPayloadType): void {
+    nodes.forEach((item, index) => {
+        item.textContent = `${newGrid[index] ?? ''}`;
+    });
 }
 
 function getSwipeAnimations({ oldGrid, newGrid, direction, gridSize }: getSwipeAnimationsPayloadType): animationType[] {

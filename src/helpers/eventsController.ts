@@ -67,21 +67,16 @@ function initiateMoveHandler({ e, game }: { e: initiateMoveType, game: Game }): 
 
 function gridItemChangeHandler(e: gridChangeType): void {
     const { oldGrid, newGrid, direction, gridSize, newGridItemIndex } = e.detail;
-    const gridNodes: NodeListOf<HTMLDivElement> = document.querySelectorAll('.grid-item');
+    const nodes: NodeListOf<HTMLDivElement> = document.querySelectorAll('.grid-item');
 
     handleAnimation({
-        nodes: gridNodes,
+        nodes,
         oldGrid,
         newGrid,
         direction,
         gridSize,
         newGridItemIndex,
     });
-    setTimeout(() => {
-        gridNodes.forEach((item, index) => {
-            item.textContent = `${newGrid[index] ?? ''}`;
-        });
-    }, 2000)
 }
 
 function scoreChangeHandler(e: scoreType): void {
