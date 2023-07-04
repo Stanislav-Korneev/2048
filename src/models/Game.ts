@@ -4,7 +4,7 @@ import collapseArray from "../helpers/collapseArray";
 import uniteArrays from "../helpers/uniteArrays";
 import { createEvent } from "../helpers/eventsController";
 
-export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'historyRollback'
+export type directionType = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'historyRollback' | 'restartGame'
 export type gridItemType = number | null
 export type historyItemType = {
     grid: gridItemType[]
@@ -22,7 +22,6 @@ interface IGame {
     history: historyItemType[]
 
     init: () => void
-    initNewGame: () => void
     renderGrid: () => void
     makeMove: (direction: directionType) => void
     addNewItem: (grid: gridItemType[]) => addNewItemType
@@ -74,7 +73,7 @@ export default class Game implements IGame {
     }
     set history(value: historyItemType[]) {
         this._history = value.slice(-3);
-        localStorage.setItem('game2048', JSON.stringify(this._history));
+        localStorage.setItem('game2048', JSON.stringify(this.history));
 
         createEvent({
             type: 'back-button-switch',
@@ -88,7 +87,9 @@ export default class Game implements IGame {
         return Math.pow(this.size, 2);
     }
 
-    init(): void {
+    init(isNewGame: boolean = false): void {
+        if (isNewGame) this.history = [];
+
         const savedData = JSON.parse(localStorage.getItem('game2048') ?? '[]');
         const { grid, score } = savedData[savedData.length - 1] ?? {};
 
@@ -96,14 +97,20 @@ export default class Game implements IGame {
         if (!grid) this.currentGrid = this.addNewItem(this.currentGrid).newGrid;
         this.score = score ?? 0;
 
-        this.renderGrid();
-    }
+        const nodes: NodeListOf<HTMLDivElement> = document.querySelectorAll('.grid-item');
+        if (!nodes.length) this.renderGrid();
 
-    initNewGame(): void {
-        this.currentGrid = new Array(this.powSize).fill(null);
-        this.currentGrid = this.addNewItem(this.currentGrid).newGrid;
-        this.score = 0;
-        this.history = [];
+        createEvent({
+            nodeId: 'grid',
+            type: 'grid-change',
+            detail: {
+                oldGrid: this.currentGrid,
+                newGrid: this.currentGrid,
+                direction: 'restartGame',
+                gridSize: this.size,
+                newGridItemIndex: null,
+            }
+        })
     }
 
     renderGrid(): void {
@@ -137,7 +144,7 @@ export default class Game implements IGame {
             nodeId: 'grid',
             type: 'grid-change',
             detail: {
-                oldGrid: this._currentGrid,
+                oldGrid: this.currentGrid,
                 newGrid,
                 direction,
                 gridSize: this.size,
@@ -212,7 +219,7 @@ export default class Game implements IGame {
             nodeId: 'grid',
             type: 'grid-change',
             detail: {
-                oldGrid: this._currentGrid,
+                oldGrid: this.currentGrid,
                 newGrid,
                 direction: 'historyRollback',
                 gridSize: this.size,

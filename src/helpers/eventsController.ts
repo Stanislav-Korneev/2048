@@ -97,5 +97,5 @@ function backButtonSwitcher(e: backButtonSwitchType): void {
 }
 
 function newGameButtonHandler(game: Game): void {
-    game.initNewGame();
+    game.init(true);
 }

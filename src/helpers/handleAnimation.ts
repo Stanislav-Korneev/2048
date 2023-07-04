@@ -37,7 +37,7 @@ export type animationType = {
 export default function handleAnimation({nodes, oldGrid, newGrid, direction, gridSize, newGridItemIndex }:
     handleAnimationPayloadType): void {
 
-    if (direction === 'historyRollback') {
+    if (direction === 'historyRollback' || direction === 'restartGame') {
         return setNewValues({nodes, newGrid});
     }
 
