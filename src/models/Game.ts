@@ -29,6 +29,7 @@ interface IGame {
     checkIsGameEnd: (grid: gridItemType[]) => string | boolean
     merge: (direction: directionType) => historyItemType
     rollBackMove: () => void
+    pushCurrentEntryToHistory: () => void
 }
 
 export default class Game implements IGame {
@@ -72,13 +73,13 @@ export default class Game implements IGame {
         return this._history;
     }
     set history(value: historyItemType[]) {
-        this._history = value.slice(-3);
+        this._history = value.slice(-4);
         localStorage.setItem('game2048', JSON.stringify(this.history));
 
         createEvent({
             type: 'back-button-switch',
             detail: {
-                status: value.length > 0,
+                status: value.length > 1,
             }
         })
     }
@@ -99,6 +100,8 @@ export default class Game implements IGame {
 
         const nodes: NodeListOf<HTMLDivElement> = document.querySelectorAll('.grid-item');
         if (!nodes.length) this.renderGrid();
+
+        this.pushCurrentEntryToHistory();
 
         createEvent({
             nodeId: 'grid',
@@ -154,10 +157,7 @@ export default class Game implements IGame {
 
         this.currentGrid = newGrid;
 
-        this.history = [... this.history, {
-            grid: this.currentGrid,
-            score: this.score,
-        }];
+        this.pushCurrentEntryToHistory();
     }
 
     addNewItem(grid: gridItemType[]): addNewItemType {
@@ -213,7 +213,8 @@ export default class Game implements IGame {
 
     rollBackMove(): void {
         if (!this.history.length) return;
-        const newGrid: gridItemType[] = this.history[this.history.length - 1].grid;
+        const targetEntryIndex = this.history.length > 1 ? this.history.length - 2 : this.history.length - 1;
+        const newGrid: gridItemType[] = this.history[targetEntryIndex].grid;
 
         createEvent({
             nodeId: 'grid',
@@ -226,10 +227,18 @@ export default class Game implements IGame {
                 newGridItemIndex: null,
             }
         })
+
         this.currentGrid = newGrid;
 
         const newHistoryEntry: historyItemType[] = [...this.history];
         newHistoryEntry.pop();
         this.history = [...newHistoryEntry];
+    }
+
+    pushCurrentEntryToHistory(): void {
+        this.history = [... this.history, {
+            grid: this.currentGrid,
+            score: this.score,
+        }];
     }
 }
