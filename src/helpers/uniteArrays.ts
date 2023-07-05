@@ -1,17 +1,18 @@
 import {directionType, gridItemType} from "../models/Game";
 import {animationType} from "./handleAnimation";
 
-interface IPayload {
-    source: sourceType
+type itemTypes = gridItemType | animationType;
+type sourceType<T extends itemTypes> = T[][];
+
+interface IPayload<T> {
+    source: sourceType<T>
     direction: directionType
     size: number
 }
-type sourceType = (gridItemType | animationType)[][]
-type resultType = (gridItemType | animationType)[]
 
-export default function uniteArrays({ source, direction, size }: IPayload): resultType {
-    let result: resultType = [];
-    let localSource: sourceType = [...source];
+export default function uniteArrays<T extends itemTypes>({ source, direction, size }: IPayload<T>): T[] {
+    let result: T[] = [];
+    let localSource: sourceType<T> = [...source];
 
     if (direction === 'ArrowRight' || direction === 'ArrowDown') {
         localSource = source.map(item => item.reverse());

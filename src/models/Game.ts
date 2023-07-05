@@ -204,11 +204,11 @@ export default class Game implements IGame {
             scoreAccumulator += score;
         });
 
-        const grid = uniteArrays({
+        const grid: gridItemType[] = uniteArrays({
             source: matrix,
             direction,
-            size: this.size,
-        }) as gridItemType[];
+            size: this.size
+        });
 
         return {
             grid,

@@ -122,7 +122,7 @@ function getSwipeAnimations({ oldGrid, newGrid, direction, gridSize }: getSwipeA
         source: slideAnimationsRows,
         direction,
         size: gridSize,
-    }) as animationType[];
+    });
 }
 
 function animateAppear(node: HTMLDivElement): void {
