@@ -15,6 +15,8 @@ type addNewItemType = {
     newGridItemIndex: number
 }
 
+type moveErrorType = 'no changes in grid' | 'game over' | 'you won!' | ''
+
 interface IGame {
     size: number
     score: number
@@ -25,8 +27,7 @@ interface IGame {
     renderGrid: () => void
     makeMove: (direction: directionType) => void
     addNewItem: (grid: gridItemType[]) => addNewItemType
-    checkIsMovePossible: (grid: gridItemType[]) => boolean
-    checkIsGameEnd: (grid: gridItemType[]) => string | boolean
+    checkForErrors: (grid: gridItemType[]) => void
     merge: (direction: directionType) => historyItemType
     rollBackMove: () => void
     pushCurrentEntryToHistory: () => void
@@ -138,9 +139,12 @@ export default class Game implements IGame {
         const { grid, score } = this.merge(direction);
         this.score += score;
 
-        if (!this.checkIsMovePossible(grid)) return;
-
-        if (this.checkIsGameEnd(grid)) return alert(this.checkIsGameEnd(grid));
+        try {
+            this.checkForErrors(grid);
+        } catch (e) {
+            if (e.message === 'no changes in grid') return;
+            return alert(e);
+        }
 
         const { newGrid, newGridItemIndex }: addNewItemType = this.addNewItem(grid);
         createEvent({
@@ -173,16 +177,17 @@ export default class Game implements IGame {
         return addToRandomSlot();
     }
 
-    checkIsMovePossible(grid: gridItemType[]): boolean {
-        const isEmptyGrid = grid.every(item => item === null);
-        const gridHasChanges = grid.some((item, index) => item !== this.currentGrid[index]);
-        return (isEmptyGrid || gridHasChanges);
-    }
+    checkForErrors(grid: gridItemType[]): void {
+        const gridHasChanges: boolean = grid.some((item, index) => item !== this.currentGrid[index]);
+        const gridIsFull: boolean = !grid.some(item => item === null);
+        const has2048: boolean = !!grid.find(item => item === 2048);
+        let errorValue: moveErrorType = '';
 
-    checkIsGameEnd(grid: gridItemType[]): string | boolean {
-        if (!grid.some(item => item === null)) return 'game over';
-        if (grid.find(item => item === 2048)) return 'you won';
-        return false;
+        if (!gridHasChanges) errorValue = 'no changes in grid';
+        if (gridIsFull) errorValue = 'game over';
+        if (has2048) errorValue = 'you won!';
+
+        if (errorValue) throw new Error(errorValue);
     }
 
     merge(direction: directionType): historyItemType {
