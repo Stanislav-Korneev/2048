@@ -1,7 +1,7 @@
 import { gridItemType, historyItemType } from "../models/Game";
 
 export default function collapseArray(payload: gridItemType[]): historyItemType {
-    let result = {
+    let result: historyItemType = {
         grid: [...payload],
         score: 0,
     }

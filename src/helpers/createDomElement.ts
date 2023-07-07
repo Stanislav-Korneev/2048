@@ -14,10 +14,10 @@ export default function createDomElement({
      parent,
  }: IPayload): HTMLElement {
 
-    const newEl: HTMLElement = document.createElement(tagName);
-    newEl.id = id;
+    const newEl: HTMLElement = document.createElement(tagName!);
+    newEl.id = id!;
+    newEl.textContent = textContent!;
     newEl.classList.add(...classList);
-    newEl.textContent = textContent;
 
     if (parent) parent.append(newEl);
     return newEl;

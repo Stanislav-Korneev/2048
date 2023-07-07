@@ -19,8 +19,7 @@ type createEventPayloadType = {
 }
 
 export function createEvent({ nodeId = '', type, detail }: createEventPayloadType): void {
-    const targetNode: HTMLElement | null = document.getElementById(nodeId as string);
-    const eventNode: HTMLElement | Document = targetNode ?? document;
+    const eventNode: HTMLElement | Document = document.getElementById(nodeId!) ?? document;
 
     const event: CustomEvent<typeof detail> = new CustomEvent(type, {
         bubbles: true,
@@ -41,14 +40,14 @@ export function initiateListeners(game: Game): void {
 
     document.addEventListener('back-button-switch', backButtonSwitcher as EventListener);
 
-    const grid = document.getElementById('grid')!;
+    const grid = document.getElementById('grid')! as HTMLDivElement;
     swipeController(grid);
 
-    const backButton = document.getElementById('back-button');
-    backButton?.addEventListener('click', () => backButtonHandler(game));
+    const backButton = document.getElementById('back-button') as HTMLButtonElement;
+    backButton.addEventListener('click', () => backButtonHandler(game));
 
-    const newGameButton = document.getElementById('new-game-button');
-    newGameButton?.addEventListener('click', () => newGameButtonHandler(game));
+    const newGameButton = document.getElementById('new-game-button') as HTMLButtonElement;
+    newGameButton.addEventListener('click', () => newGameButtonHandler(game));
 }
 
 function keydownHandler(e: KeyboardEvent): void {
@@ -66,7 +65,13 @@ function initiateMoveHandler({ e, game }: { e: initiateMoveType, game: Game }): 
 }
 
 function gridItemChangeHandler(e: gridChangeType): void {
-    const { oldGrid, newGrid, direction, gridSize, newGridItemIndex } = e.detail;
+    const {
+        oldGrid,
+        newGrid,
+        direction,
+        gridSize,
+        newGridItemIndex
+    } = e.detail;
     const nodes: NodeListOf<HTMLDivElement> = document.querySelectorAll('.grid-item');
 
     handleAnimation({
@@ -80,7 +85,7 @@ function gridItemChangeHandler(e: gridChangeType): void {
 }
 
 function scoreChangeHandler(e: scoreType): void {
-    const target = document.getElementById('score');
+    const target = document.getElementById('score') as HTMLDivElement;
     if (target) target.textContent = `score: ${ e.detail.newScore }`;
 }
 

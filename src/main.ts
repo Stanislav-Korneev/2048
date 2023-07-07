@@ -4,4 +4,4 @@ import { initiateListeners } from "./helpers/eventsController";
 
 const game: Game = new Game();
 initiateListeners(game);
-game.init();
+game.init(false);

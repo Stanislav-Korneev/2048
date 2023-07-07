@@ -23,7 +23,7 @@ export default function uniteArrays<T extends itemTypes>({ source, direction, si
     }
 
     if (direction === 'ArrowDown' || direction === 'ArrowUp') {
-        for (let i = 0; i < size; i++) {
+        for (let i: number = 0; i < size; i++) {
             localSource.forEach((item) => {
                 result.push(item[i]);
             })

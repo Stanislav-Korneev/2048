@@ -2,15 +2,16 @@ import {createEvent} from "./eventsController";
 import {directionType} from "../models/Game";
 
 type devicesType = 'touch' | 'mouse'
+type touchEventValueType = {
+    start: 'touchstart' | 'mousedown'
+    move: 'touchmove' | 'mousemove'
+    end: 'touchend' | 'mouseup'
+}
 type touchEventsValuesType = {
-    [x in devicesType]: {
-        start: 'touchstart' | 'mousedown'
-        move: 'touchmove' | 'mousemove'
-        end: 'touchend' | 'mouseup'
-    }
+    [x in devicesType]: touchEventValueType
 }
 
-const touchEventsValues = {
+const touchEventsValues: touchEventsValuesType = {
     touch: {
         start: 'touchstart',
         move: 'touchmove',
@@ -21,7 +22,7 @@ const touchEventsValues = {
         move: 'mousemove',
         end: 'mouseup',
     }
-} as touchEventsValuesType
+}
 
 const checkDeviceType = (): devicesType => {
     try {
@@ -42,7 +43,7 @@ export default (target: HTMLElement): void => {
     const rectTop: number = target.getBoundingClientRect().top;
 
     const deviceType: devicesType = checkDeviceType();
-    const touchEvents = touchEventsValues[deviceType];
+    const touchEvents: touchEventValueType = touchEventsValues[deviceType];
 
     target.addEventListener(touchEvents.start, startHandler);
 
@@ -63,8 +64,8 @@ export default (target: HTMLElement): void => {
     function endHandler(event: TouchEvent | MouseEvent): void {
         event.preventDefault();
         getXY(event);
-        let diffX = mouseX - initialX;
-        let diffY = mouseY - initialY;
+        let diffX: number = mouseX - initialX;
+        let diffY: number = mouseY - initialY;
         let direction: directionType;
         if (Math.abs(diffY) > Math.abs(diffX)) {
             direction = diffY > 0 ? 'ArrowDown' : 'ArrowUp';

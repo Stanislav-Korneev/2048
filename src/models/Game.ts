@@ -26,9 +26,9 @@ interface IGame {
     init: () => void
     renderGrid: () => void
     makeMove: (direction: directionType) => void
-    addNewItem: (grid: gridItemType[]) => addNewItemType
     checkForErrors: (grid: gridItemType[]) => void
     merge: (direction: directionType) => historyItemType
+    addNewItem: (grid: gridItemType[]) => addNewItemType
     rollBackMove: () => void
     pushCurrentEntryToHistory: () => void
 }
@@ -69,7 +69,6 @@ export default class Game implements IGame {
     set currentGrid(value: gridItemType[]) {
         this._currentGrid = value;
     }
-
     get history(): historyItemType[] {
         return this._history;
     }
@@ -89,10 +88,10 @@ export default class Game implements IGame {
         return Math.pow(this.size, 2);
     }
 
-    init(isNewGame: boolean = false): void {
-        if (isNewGame) this.history = [];
+    init(clearHistory: boolean = false): void {
+        if (clearHistory) this.history = [];
 
-        const savedData = JSON.parse(localStorage.getItem('game2048') ?? '[]');
+        const savedData: historyItemType[] = JSON.parse(localStorage.getItem('game2048') ?? '[]');
         const { grid, score } = savedData[savedData.length - 1] ?? {};
 
         this.currentGrid = grid ?? new Array(this.powSize).fill(null);
@@ -118,8 +117,8 @@ export default class Game implements IGame {
     }
 
     renderGrid(): void {
-        const grid = document.getElementById('grid')!;
-        const gridBackdrop = document.getElementById('grid-backdrop')!;
+        const grid = document.getElementById('grid') as HTMLDivElement;
+        const gridBackdrop = document.getElementById('grid-backdrop') as HTMLDivElement;
 
         this.currentGrid.forEach(() => createDomElement({
             classList: ['grid-item-backdrop'],
@@ -146,7 +145,7 @@ export default class Game implements IGame {
             return alert(e);
         }
 
-        const { newGrid, newGridItemIndex }: addNewItemType = this.addNewItem(grid);
+        const { newGrid, newGridItemIndex } = this.addNewItem(grid);
         createEvent({
             nodeId: 'grid',
             type: 'grid-change',
@@ -164,19 +163,6 @@ export default class Game implements IGame {
         this.pushCurrentEntryToHistory();
     }
 
-    addNewItem(grid: gridItemType[]): addNewItemType {
-        const newItem: 2|4 = (Math.random() * (11 - 1) + 1) < 9 ? 2 : 4;
-        const result = [...grid];
-
-        const addToRandomSlot = (): addNewItemType => {
-            const newIndex = Math.floor(Math.random() * (this.powSize + 1));
-            if (result[newIndex] !== null) return addToRandomSlot();
-            result[newIndex] = newItem;
-            return { newGrid: result , newGridItemIndex: newIndex};
-        }
-        return addToRandomSlot();
-    }
-
     checkForErrors(grid: gridItemType[]): void {
         const gridHasChanges: boolean = grid.some((item, index) => item !== this.currentGrid[index]);
         const gridIsFull: boolean = !grid.some(item => item === null);
@@ -191,7 +177,7 @@ export default class Game implements IGame {
     }
 
     merge(direction: directionType): historyItemType {
-        let scoreAccumulator = 0;
+        let scoreAccumulator: number = 0;
         let matrix = parseArray({
             source: this.currentGrid,
             direction,
@@ -216,9 +202,22 @@ export default class Game implements IGame {
         };
     }
 
+    addNewItem(grid: gridItemType[]): addNewItemType {
+        const newItem: 2|4 = (Math.random() * (11 - 1) + 1) < 9 ? 2 : 4;
+        const resultGrid: gridItemType[] = [...grid];
+
+        const addToRandomSlot = (): addNewItemType => {
+            const newIndex: number = Math.floor(Math.random() * (this.powSize + 1));
+            if (resultGrid[newIndex] !== null) return addToRandomSlot();
+            resultGrid[newIndex] = newItem;
+            return { newGrid: resultGrid , newGridItemIndex: newIndex};
+        }
+        return addToRandomSlot();
+    }
+
     rollBackMove(): void {
         if (!this.history.length) return;
-        const targetEntryIndex = this.history.length > 1 ? this.history.length - 2 : this.history.length - 1;
+        const targetEntryIndex: number = this.history.length > 1 ? this.history.length - 2 : this.history.length - 1;
         const newGrid: gridItemType[] = this.history[targetEntryIndex].grid;
 
         createEvent({

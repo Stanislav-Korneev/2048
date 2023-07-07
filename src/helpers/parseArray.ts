@@ -20,7 +20,7 @@ export default function parseArray({ source, direction, size }: IPayload): gridI
         })
         matrix = matrix.map((item, index) => {
             return item.map((_subItem, subIndex) => {
-                const targetIndex = (subIndex * size) + index;
+                const targetIndex: number = (subIndex * size) + index;
                 return source[targetIndex];
             })
         })
