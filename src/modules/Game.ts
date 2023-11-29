@@ -14,6 +14,14 @@ export class Game implements IGame {
         this._history = [];
     }
 
+    get size(): 4 {
+        return this._size;
+    }
+
+    get ctx(): CanvasRenderingContext2D {
+        return this._ctx;
+    }
+
     get score(): number {
         return this._score;
     }
