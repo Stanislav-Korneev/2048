@@ -1,4 +1,4 @@
-import { gridType, historyItemType, IGame } from "./typesAndInterfaces.ts";
+import {gridType, historyItemType, IGame} from "./typesAndInterfaces.ts";
 export class Game implements IGame {
     private readonly _size: 4
     private readonly _ctx: CanvasRenderingContext2D
@@ -47,7 +47,7 @@ export class Game implements IGame {
     renderGrid(): void {}
     makeMove(): void {}
     checkErrors(): void {}
-    addNewItem(): void {}
+    addNewBlock(): void {}
     rollBack(): void {}
     updateHistory(): void {}
     handleGameOver(): void {}

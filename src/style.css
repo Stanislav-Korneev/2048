@@ -27,3 +27,7 @@ body {
   height: 200px;
   background-color: aqua;
 }
+
+#tiles_sprite {
+  display: none;
+}

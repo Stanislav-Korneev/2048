@@ -1,7 +1,7 @@
 // Input controller processes all key and button events in the game
 
 import swipeController from "./SwipeController.ts";
-import { directionType, IGame } from "./Game.ts";
+import {directionType, IGame} from "./typesAndInterfaces.ts";
 
 export default ({ game, canvas, newGameButton, undoButton, howToPlayButton }: {
     game: IGame,
