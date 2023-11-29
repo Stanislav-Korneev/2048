@@ -1,2 +1,2 @@
-interface IGame {}
-export default class Game implements IGame {}
+export interface IGame {}
+export class Game implements IGame {}
