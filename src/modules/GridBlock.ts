@@ -19,7 +19,7 @@ export default class GridBlock implements IGridBlock {
         posX: gridBlockPositionType,
         posY: gridBlockPositionType,
     }) {
-        this._size = 50;
+        this._size = 100;
         this._sprite = document.getElementById('tiles_sprite') as HTMLImageElement;
         this._ctx = ctx;
         this._value = value;

@@ -23,9 +23,10 @@ body {
 }
 
 #game-canvas {
-  width: 200px;
-  height: 200px;
-  background-color: aqua;
+  width: 500px;
+  height: 500px;
+  background-image: url("img/field.png");
+  background-size: contain;
 }
 
 #tiles_sprite {
