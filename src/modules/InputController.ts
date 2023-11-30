@@ -27,10 +27,7 @@ export default ({ game, canvas, newGameButton, undoButton, howToPlayButton }: {
         }
     })
 
-    newGameButton.addEventListener('click', (e: MouseEvent): void => {
-        e.preventDefault();
-        console.log('newGameButtonClick');
-    })
+    newGameButton.addEventListener('click', (): void => game.init());
 
     undoButton.addEventListener('click', (e: MouseEvent): void => {
         e.preventDefault();

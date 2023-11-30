@@ -13,13 +13,14 @@ export default class GridBlock implements IGridBlock {
     private _posX: gridBlockPositionType
     private _posY: gridBlockPositionType
 
-    constructor({ ctx, value, posX, posY }: {
+    constructor({ ctx, size, value, posX, posY }: {
         ctx: CanvasRenderingContext2D,
+        size: gridBlockSizeType,
         value: gridBlockValueType,
         posX: gridBlockPositionType,
         posY: gridBlockPositionType,
     }) {
-        this._size = 100;
+        this._size = size;
         this._sprite = document.getElementById('tiles_sprite') as HTMLImageElement;
         this._ctx = ctx;
         this._value = value;
@@ -56,5 +57,12 @@ export default class GridBlock implements IGridBlock {
     }
     set posY(value: gridBlockPositionType) {
         this._posY = value;
+    }
+
+    get imgXCoordinate(): number {
+        // sprite block size is 268x270 and space between blocks is 5
+        // all sprite blocks are in ascending order
+        // so depending on the block value we can calculate the position of sprite block
+        return (Math.log2(this.value) - 1) * (268 + 5);
     }
 }
