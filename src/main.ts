@@ -1,7 +1,11 @@
 import './style.css'
 import inputController from "./modules/InputController.ts";
 import {Game} from "./modules/Game.ts";
-import {deviceSizeType, interfaceSizesType} from "./modules/typesAndInterfaces.ts";
+import {
+    deviceSizeType,
+    gameConfigType,
+} from "./modules/typesAndInterfaces.ts";
+import gameConfig from "./gameConfig.json";
 
 // get vital elements
 const newGameButton: HTMLButtonElement = document.getElementById('new-game-button') as HTMLButtonElement;
@@ -9,26 +13,19 @@ const undoButton: HTMLButtonElement = document.getElementById('undo-button') as 
 const howToPlayButton: HTMLButtonElement = document.getElementById('how-to-play-button') as HTMLButtonElement;
 const canvas: HTMLCanvasElement = document.getElementById('game-canvas') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+const tileSprite: HTMLImageElement = document.getElementById('tiles_sprite') as HTMLImageElement
 
-const sizes: interfaceSizesType = {
-    s: {
-        fieldSize: 290,
-        gridBlockSize: 58,
-        gridBlockPositions: [20, 84, 148, 212]
-    },
-    l: {
-        fieldSize: 500,
-        gridBlockSize: 100,
-        gridBlockPositions: [35, 145, 255, 365]
-    },
-}
+// get game config depending on the device
 const deviceSize: deviceSizeType = window.screen.width > 768 ? 'l' : 's';
-canvas.width = sizes[deviceSize].fieldSize;
-canvas.height = sizes[deviceSize].fieldSize;
+const config: gameConfigType = gameConfig[deviceSize] as gameConfigType;
+
+canvas.width = config.canvasSize;
+canvas.height = config.canvasSize;
 
 const game: Game = new Game({
+    config: config,
     ctx,
-    ...sizes[deviceSize],
+    tileSprite,
 });
 inputController({ game, canvas, newGameButton, undoButton, howToPlayButton });
 

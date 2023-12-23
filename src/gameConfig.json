@@ -1,0 +1,22 @@
+{
+  "s": {
+    "canvasSize": 290,
+    "gridBlockSize": 58,
+    "gridBlockPositions": [20, 84, 148, 212],
+    "animationOptions": {
+      "duration": 150,
+      "deleteModifier": 100,
+      "pulseModifier": 20
+    }
+  },
+  "l": {
+    "canvasSize": 500,
+    "gridBlockSize": 100,
+    "gridBlockPositions": [35, 145, 255, 365],
+    "animationOptions": {
+      "duration": 150,
+      "deleteModifier": 100,
+      "pulseModifier": 20
+    }
+  }
+}

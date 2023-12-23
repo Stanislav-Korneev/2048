@@ -22,8 +22,8 @@ export default ({ game, canvas, newGameButton, undoButton, howToPlayButton }: {
             ['ArrowLeft', 'left'],
         ]);
         if(keyMap.has(e.code)) {
-            console.log('key listener', keyMap.get(e.code));
-            console.log(game);
+            game.moveDirection = keyMap.get(e.code)!;
+            game.makeMove();
         }
     })
 

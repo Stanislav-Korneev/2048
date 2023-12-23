@@ -1,86 +1,180 @@
 import {
-    gridBlockPositionType,
-    gridBlockSizeType,
+    directionType,
+    gameConfigType,
     gridType,
     historyItemType,
-    IGame
+    IGame,
+    slotType,
 } from "./typesAndInterfaces.ts";
 import GridBlock from "./GridBlock.ts";
 export class Game implements IGame {
+    private readonly _config: gameConfigType
     private readonly _ctx: CanvasRenderingContext2D
-    private readonly _gridBlockSize: gridBlockSizeType
-    private readonly _gridBlockPositions: gridBlockPositionType[]
-    private _score: number
+    private readonly _tileSprite: HTMLImageElement
+    private readonly _availableSlots: slotType[]
     private _grid: gridType
+    private _score: number
     private _history: historyItemType[]
+    private _moveDirection: directionType
+    private _prevFrameTime: number
 
-    constructor({ctx, gridBlockSize, gridBlockPositions}: {
+    constructor({config, ctx, tileSprite}: {
+        config: gameConfigType,
         ctx: CanvasRenderingContext2D,
-        gridBlockSize: gridBlockSizeType,
-        gridBlockPositions: gridBlockPositionType[]
+        tileSprite: HTMLImageElement
     }) {
+        this._config = config;
         this._ctx = ctx;
-        this._gridBlockSize = gridBlockSize;
-        this._gridBlockPositions = gridBlockPositions;
+        this._tileSprite = tileSprite;
+        this._grid = [];
         this._score = 0;
-        this._grid = new Map();
         this._history = [];
+        this._moveDirection = '';
+        this._availableSlots = [];
+        config.gridBlockPositions.forEach(slotX => {
+            config.gridBlockPositions.forEach(slotY => {
+                this._availableSlots.push([slotX, slotY]);
+            })
+        })
+        this._prevFrameTime = 0;
     }
 
+    get config(): gameConfigType {
+        return this._config;
+    }
     get ctx(): CanvasRenderingContext2D {
         return this._ctx;
     }
-    get gridBlockSize(): gridBlockSizeType {
-        return this._gridBlockSize;
+    get tileSprite(): HTMLImageElement {
+        return this._tileSprite;
     }
-    get gridBlockPositions(): gridBlockPositionType[] {
-        return this._gridBlockPositions;
+    get availableSlots(): slotType[] {
+        return this._availableSlots.filter(availableSlot => {
+            return !this.grid
+                .some(gridBlock => availableSlot.toString() === gridBlock.slot.toString());
+        })
     }
-
-    get score(): number {
-        return this._score;
-    }
-    set score(value: number) {
-        this._score = value;
-    }
-
     get grid(): gridType {
         return this._grid;
     }
     set grid(value: gridType) {
         this._grid = value;
     }
-
+    get score(): number {
+        return this._score;
+    }
+    set score(value: number) {
+        this._score = value;
+    }
     get history(): historyItemType[] {
         return this._history;
     }
     set history(value: historyItemType[]) {
         this._history = value;
     }
+    get moveDirection(): directionType {
+        return this._moveDirection;
+    }
+    set moveDirection(value: directionType) {
+        this._moveDirection = value;
+    }
+    get prevFrameTime(): number {
+        return this._prevFrameTime;
+    }
+    set prevFrameTime(value: number) {
+        this._prevFrameTime = value;
+    }
+
+    // auxiliary getters dependant on class properties
+    get parsedRows() {
+        // so here we parse all our gridItems in 2d array.
+        // if we move left or right - the movement axis is 'X'. So block's coordinate on 'X' axis
+        // will be 'mainPos' and 'secondaryPos' will be on 'Y' axis.
+        // so we can filter gridItems to different rows by their 'secondaryPos'.
+        // inside those rows we sort gridItems by 'mainPos' depending on the direction.
+        const rows: GridBlock[][] = [];
+        this.config.gridBlockPositions.forEach(pos => {
+            const row: GridBlock[] = this.grid
+                .filter(gridBlock => gridBlock.secondaryPos === pos)
+                .sort((a, b) => {
+                    return (this.moveDirection === 'up' || this.moveDirection === 'left')
+                        ? a.mainPos - b.mainPos
+                        : b.mainPos - a.mainPos;
+                })
+            if(row.length) rows.push(row);
+        })
+        return rows;
+    }
 
     init(): void {
-        this.addNewBlock();
+        this.makeMove();
     }
-    renderGrid(): void {}
-    makeMove(): void {}
-    checkErrors(): void {}
-    addNewBlock(): void {
-        const getRandomIndex = (): number => Math.round(Math.random() * (this.gridBlockPositions.length - 1));
-        console.log(getRandomIndex());
-        const value: 2|4 = (Math.random() * (11 - 1) + 1) < 9 ? 2 : 4;
-        const posX: gridBlockPositionType = this.gridBlockPositions[getRandomIndex()];
-        const posY: gridBlockPositionType = this.gridBlockPositions[getRandomIndex()];
-        const newBlock: GridBlock = new GridBlock({
-            ctx: this.ctx,
-            size: this.gridBlockSize,
-            value,
-            posX,
-            posY
-        });
-        console.log(newBlock);
+    makeMove(): void {
+        if (!this.checkErrors()) return;
+        this.updateBlocks();
+        this.addNewBlock();
+        requestAnimationFrame(this.handleAnimation.bind(this));
+    }
+    checkErrors(): boolean {
+        return this.grid.length !== 16;
+    }
+    updateBlocks(): void {
+        this.parsedRows.forEach(row => {
+            row.forEach((gridBlock, gridBlockIndex) => {
+                this.updateBlockData({
+                    gridBlock: gridBlock,
+                    prevGridBlock: row[gridBlockIndex - 1],
+                });
+            })
+        })
+    }
+    updateBlockData({gridBlock, prevGridBlock}: {gridBlock: GridBlock, prevGridBlock: GridBlock }): void {
+        // any block potentially moves, so it gets 'move' status. If there is eventually no movement that's not a problem
+        gridBlock.animationStatus.add('move');
+        // the first block automatically goes to the border position
+        if(!prevGridBlock) {
+            gridBlock.moveToBorderSlot();
+            return;
+        }
 
-        this.ctx.drawImage(newBlock.sprite, newBlock.imgXCoordinate, 0, 268, 270, newBlock.posX, newBlock.posY, this.gridBlockSize, this.gridBlockSize);
-        console.log(this.ctx)
+        // case when merge is possible
+        if(prevGridBlock.value === gridBlock.value
+            && !prevGridBlock.animationStatus.has('delete')
+            && !prevGridBlock.animationStatus.has('pulse')
+        ) {
+            prevGridBlock.animationStatus.add('pulse');
+            prevGridBlock.value *= 2;
+            gridBlock.animationStatus.add('delete');
+            gridBlock.slot = prevGridBlock.slot;
+            return;
+        }
+
+        // by default, we move block to the neighbourSlot of the previous block
+        gridBlock.slot = prevGridBlock.neighbourSlot;
+    }
+    addNewBlock(): void {
+        const value: 2|4 = (Math.random() * (11 - 1) + 1) < 9 ? 2 : 4;
+        const slot: slotType = this.availableSlots[Math.floor(Math.random()*this.availableSlots.length)];
+        const newBlock: GridBlock = new GridBlock({
+            game: this,
+            value,
+            slot,
+        });
+        this.grid.push(newBlock);
+    }
+    handleAnimation(timestamp: number): void {
+        this.ctx.clearRect(0, 0, this.config.canvasSize, this.config.canvasSize);
+        if(this.prevFrameTime === 0) this.prevFrameTime = timestamp;
+        const stepDuration: number = (timestamp - this.prevFrameTime) / (this.config.animationOptions.duration);
+
+        this.grid.forEach(gridBlock => gridBlock.update(stepDuration));
+
+        if(this.grid.some(gridBlock => gridBlock.animationStatus.size)) {
+            requestAnimationFrame(this.handleAnimation.bind(this));
+            this.prevFrameTime = timestamp;
+        } else {
+            this.prevFrameTime = 0;
+        }
     }
     rollBack(): void {}
     updateHistory(): void {}
