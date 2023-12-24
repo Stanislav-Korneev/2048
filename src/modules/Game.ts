@@ -2,11 +2,12 @@ import {
     directionType,
     gameConfigType,
     gridType,
-    historyItemType,
-    IGame, interfaceElementsType,
+    IGame,
+    interfaceElementsType,
     slotType,
 } from "./typesAndInterfaces.ts";
 import GridBlock from "./GridBlock.ts";
+import {History} from "./History.ts";
 export class Game implements IGame {
     private readonly _config: gameConfigType
     private readonly _ctx: CanvasRenderingContext2D
@@ -14,8 +15,8 @@ export class Game implements IGame {
     private readonly _interfaceElements: interfaceElementsType
     private readonly _availableSlots: slotType[]
     private readonly _grid: gridType
+    private readonly _history: History
     private _score: number
-    private _history: historyItemType[]
     private _moveDirection: directionType
     private _prevFrameTime: number
 
@@ -31,7 +32,7 @@ export class Game implements IGame {
         this._interfaceElements = interfaceElements
         this._grid = [];
         this._score = 0;
-        this._history = [];
+        this._history = new History();
         this._moveDirection = '';
         this._availableSlots = [];
         config.gridBlockPositions.forEach(slotX => {
@@ -63,18 +64,15 @@ export class Game implements IGame {
     get grid(): gridType {
         return this._grid;
     }
+    get history(): History {
+        return this._history;
+    }
     get score(): number {
         return this._score;
     }
     set score(value: number) {
         this._score = value;
-        this.interfaceElements.score.textContent = value.toString();
-    }
-    get history(): historyItemType[] {
-        return this._history;
-    }
-    set history(value: historyItemType[]) {
-        this._history = value;
+        this.history.bestScore = value;
     }
     get moveDirection(): directionType {
         return this._moveDirection;
@@ -118,6 +116,8 @@ export class Game implements IGame {
         this.updateBlocks();
         this.addNewBlock();
         requestAnimationFrame(this.handleAnimation.bind(this));
+        this.history.push({grid: this.grid, score: this.score});
+        this.updateInterface();
     }
     checkErrors(): boolean {
         return this.grid.length !== 16;
@@ -181,7 +181,10 @@ export class Game implements IGame {
             this.prevFrameTime = 0;
         }
     }
+    updateInterface(): void {
+        this.interfaceElements.score.textContent = this.score.toString();
+        this.interfaceElements.bestScore.textContent = this.history.bestScore.toString();
+    }
     rollBack(): void {}
-    updateHistory(): void {}
     handleGameOver(): void {}
 }

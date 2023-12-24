@@ -1,5 +1,6 @@
 import GridBlock from "./GridBlock.ts";
 import {Game} from "./Game.ts";
+import {History} from "./History.ts";
 
 export type deviceSizeType = 's' | 'l';
 export type canvasSizeType = 290 | 500
@@ -14,9 +15,13 @@ export type animationStatusType = Set<'move' | 'pulse' | 'delete'>
 export type slotType = [gridBlockPositionType, gridBlockPositionType]
 export type axisType = 'X' | 'Y';
 export type gridType = GridBlock[]
-export type historyItemType = {
+export type historyRecordGridType = {
     value: gridBlockValueType
     slot: slotType
+}
+export type historyRecordType = {
+    score: number
+    grid: historyRecordGridType[]
 }
 export type gameConfigType = {
     canvasSize: canvasSizeType
@@ -39,8 +44,8 @@ export interface IGame {
     tileSprite: HTMLImageElement
     availableSlots: slotType[]
     grid: gridType
+    history: History
     score: number
-    history: historyItemType[]
     moveDirection: directionType
     prevFrameTime: number
 
@@ -51,8 +56,8 @@ export interface IGame {
     updateBlockData: ({gridBlock, prevGridBlock}: {gridBlock: GridBlock, prevGridBlock: GridBlock}) => void
     addNewBlock: () => void
     handleAnimation: (timestamp: number) => void
+    updateInterface: () => void
     rollBack: () => void
-    updateHistory: () => void
     handleGameOver: () => void
 }
 
@@ -81,4 +86,11 @@ export interface IGridBlock {
     handlePulse: (scale: number) => void
     draw: () => void
     selfDestruct: () => void
+}
+
+export interface IHistory {
+    bestScore: number
+    history: historyRecordType[]
+    push: ({grid, score}: {grid: gridType, score: number}) => void
+    pop: () => historyRecordType | undefined
 }
