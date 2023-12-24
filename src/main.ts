@@ -3,7 +3,7 @@ import inputController from "./modules/InputController.ts";
 import {Game} from "./modules/Game.ts";
 import {
     deviceSizeType,
-    gameConfigType,
+    gameConfigType, interfaceElementsType,
 } from "./modules/typesAndInterfaces.ts";
 import gameConfig from "./gameConfig.json";
 
@@ -14,6 +14,12 @@ const howToPlayButton: HTMLButtonElement = document.getElementById('how-to-play-
 const canvas: HTMLCanvasElement = document.getElementById('game-canvas') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
 const tileSprite: HTMLImageElement = document.getElementById('tiles_sprite') as HTMLImageElement
+const score: HTMLSpanElement = document.getElementById('score') as HTMLSpanElement;
+const bestScore: HTMLSpanElement = document.getElementById('best-score') as HTMLSpanElement;
+const interfaceElements: interfaceElementsType = {
+    score,
+    bestScore,
+}
 
 // get game config depending on the device
 const deviceSize: deviceSizeType = window.screen.width > 768 ? 'l' : 's';
@@ -26,6 +32,7 @@ const game: Game = new Game({
     config: config,
     ctx,
     tileSprite,
+    interfaceElements,
 });
 inputController({ game, canvas, newGameButton, undoButton, howToPlayButton });
 

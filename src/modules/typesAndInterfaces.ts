@@ -28,6 +28,10 @@ export type gameConfigType = {
         pulseModifier: number
     }
 }
+export type interfaceElementsType = {
+    score: HTMLSpanElement,
+    bestScore: HTMLSpanElement,
+}
 
 export interface IGame {
     config: gameConfigType

@@ -3,7 +3,7 @@ import {
     gameConfigType,
     gridType,
     historyItemType,
-    IGame,
+    IGame, interfaceElementsType,
     slotType,
 } from "./typesAndInterfaces.ts";
 import GridBlock from "./GridBlock.ts";
@@ -11,21 +11,24 @@ export class Game implements IGame {
     private readonly _config: gameConfigType
     private readonly _ctx: CanvasRenderingContext2D
     private readonly _tileSprite: HTMLImageElement
+    private readonly _interfaceElements: interfaceElementsType
     private readonly _availableSlots: slotType[]
-    private _grid: gridType
+    private readonly _grid: gridType
     private _score: number
     private _history: historyItemType[]
     private _moveDirection: directionType
     private _prevFrameTime: number
 
-    constructor({config, ctx, tileSprite}: {
+    constructor({config, ctx, tileSprite, interfaceElements}: {
         config: gameConfigType,
         ctx: CanvasRenderingContext2D,
         tileSprite: HTMLImageElement
+        interfaceElements: interfaceElementsType
     }) {
         this._config = config;
         this._ctx = ctx;
         this._tileSprite = tileSprite;
+        this._interfaceElements = interfaceElements
         this._grid = [];
         this._score = 0;
         this._history = [];
@@ -48,6 +51,9 @@ export class Game implements IGame {
     get tileSprite(): HTMLImageElement {
         return this._tileSprite;
     }
+    get interfaceElements(): interfaceElementsType {
+        return this._interfaceElements;
+    }
     get availableSlots(): slotType[] {
         return this._availableSlots.filter(availableSlot => {
             return !this.grid
@@ -57,14 +63,12 @@ export class Game implements IGame {
     get grid(): gridType {
         return this._grid;
     }
-    set grid(value: gridType) {
-        this._grid = value;
-    }
     get score(): number {
         return this._score;
     }
     set score(value: number) {
         this._score = value;
+        this.interfaceElements.score.textContent = value.toString();
     }
     get history(): historyItemType[] {
         return this._history;
@@ -144,6 +148,7 @@ export class Game implements IGame {
         ) {
             prevGridBlock.animationStatus.add('pulse');
             prevGridBlock.value *= 2;
+            this.score += prevGridBlock.value;
             gridBlock.animationStatus.add('delete');
             gridBlock.slot = prevGridBlock.slot;
             return;
