@@ -37,4 +37,7 @@ export class History implements IHistory {
     pop(): void {
         this.records = this.records.slice(0, -1);
     }
+    clearRecords(): void {
+        this.records = [];
+    }
 }

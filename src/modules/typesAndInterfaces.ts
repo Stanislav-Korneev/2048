@@ -34,9 +34,10 @@ export type gameConfigType = {
     }
 }
 export type interfaceElementsType = {
-    score: HTMLSpanElement,
-    bestScore: HTMLSpanElement,
-    undoButton: HTMLButtonElement,
+    score: HTMLSpanElement
+    bestScore: HTMLSpanElement
+    undoButton: HTMLButtonElement
+    newGameButton: HTMLButtonElement
 }
 
 export interface IGame {
@@ -59,6 +60,7 @@ export interface IGame {
     handleAnimation: (timestamp: number) => void
     updateInterface: () => void
     undoLastMove: () => void
+    startNewGame: () => void
     handleGameOver: () => void
 }
 

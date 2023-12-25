@@ -27,7 +27,7 @@ export default ({ game, canvas, newGameButton, undoButton, howToPlayButton }: {
         }
     })
 
-    newGameButton.addEventListener('click', (): void => game.init());
+    newGameButton.addEventListener('click', (): void => game.startNewGame());
 
     undoButton.addEventListener('click', (): void => game.undoLastMove())
 

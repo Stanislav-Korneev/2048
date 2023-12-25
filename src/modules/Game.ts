@@ -205,5 +205,10 @@ export class Game implements IGame {
         this.history.pop();
         this.loadStateFromHistory();
     }
+    startNewGame(): void {
+        this.history.clearRecords();
+        this.grid = [];
+        this.init();
+    }
     handleGameOver(): void {}
 }

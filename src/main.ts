@@ -20,6 +20,7 @@ const interfaceElements: interfaceElementsType = {
     score,
     bestScore,
     undoButton,
+    newGameButton,
 }
 
 // get game config depending on the device
