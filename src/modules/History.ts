@@ -1,6 +1,9 @@
 import {gridType, historyRecordType, IHistory} from "./typesAndInterfaces.ts";
 
 export class History implements IHistory {
+    get size(): number {
+        return this.records.length;
+    }
     get bestScore(): number {
         return Number(localStorage.getItem('best-score')) ?? 0;
     }
@@ -13,6 +16,9 @@ export class History implements IHistory {
     }
     set records(value: historyRecordType[]) {
         localStorage.setItem('history', JSON.stringify(value));
+    }
+    get lastRecord(): historyRecordType {
+        return this.records[this.records.length - 1];
     }
 
     push({grid, score}: {grid: gridType, score: number}): void {

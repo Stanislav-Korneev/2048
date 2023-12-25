@@ -14,8 +14,8 @@ export class Game implements IGame {
     private readonly _tileSprite: HTMLImageElement
     private readonly _interfaceElements: interfaceElementsType
     private readonly _availableSlots: slotType[]
-    private readonly _grid: gridType
     private readonly _history: History
+    private _grid: gridType
     private _score: number
     private _moveDirection: directionType
     private _prevFrameTime: number
@@ -30,17 +30,17 @@ export class Game implements IGame {
         this._ctx = ctx;
         this._tileSprite = tileSprite;
         this._interfaceElements = interfaceElements
+        this._history = new History();
         this._grid = [];
         this._score = 0;
-        this._history = new History();
         this._moveDirection = '';
+        this._prevFrameTime = 0;
         this._availableSlots = [];
         config.gridBlockPositions.forEach(slotX => {
             config.gridBlockPositions.forEach(slotY => {
                 this._availableSlots.push([slotX, slotY]);
             })
         })
-        this._prevFrameTime = 0;
     }
 
     get config(): gameConfigType {
@@ -61,11 +61,14 @@ export class Game implements IGame {
                 .some(gridBlock => availableSlot.toString() === gridBlock.slot.toString());
         })
     }
+    get history(): History {
+        return this._history;
+    }
     get grid(): gridType {
         return this._grid;
     }
-    get history(): History {
-        return this._history;
+    set grid(value: gridType) {
+        this._grid = value;
     }
     get score(): number {
         return this._score;
@@ -109,7 +112,8 @@ export class Game implements IGame {
     }
 
     init(): void {
-        this.makeMove();
+        if(this.history.size) this.loadStateFromHistory();
+        else this.makeMove();
     }
     makeMove(): void {
         if (!this.checkErrors()) return;
@@ -185,6 +189,14 @@ export class Game implements IGame {
         const {score, bestScore} = this.interfaceElements;
         score.textContent = this.score.toString();
         bestScore.textContent = this.history.bestScore.toString();
+    }
+    loadStateFromHistory(): void {
+        this.grid = this.history.lastRecord.grid.map(gridItem => {
+            return new GridBlock({game: this, value: gridItem.value, slot: gridItem.slot});
+        });
+        this.score = this.history.lastRecord.score;
+        requestAnimationFrame(this.handleAnimation.bind(this));
+        this.updateInterface();
     }
     rollBack(): void {}
     handleGameOver(): void {}
