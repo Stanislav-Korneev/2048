@@ -90,7 +90,7 @@ export interface IGridBlock {
 
 export interface IHistory {
     bestScore: number
-    history: historyRecordType[]
+    records: historyRecordType[]
     push: ({grid, score}: {grid: gridType, score: number}) => void
     pop: () => historyRecordType | undefined
 }

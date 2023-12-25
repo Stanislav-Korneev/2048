@@ -182,8 +182,9 @@ export class Game implements IGame {
         }
     }
     updateInterface(): void {
-        this.interfaceElements.score.textContent = this.score.toString();
-        this.interfaceElements.bestScore.textContent = this.history.bestScore.toString();
+        const {score, bestScore} = this.interfaceElements;
+        score.textContent = this.score.toString();
+        bestScore.textContent = this.history.bestScore.toString();
     }
     rollBack(): void {}
     handleGameOver(): void {}

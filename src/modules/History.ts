@@ -8,10 +8,10 @@ export class History implements IHistory {
         if(value < this.bestScore) return;
         localStorage.setItem('best-score', value.toString());
     }
-    get history(): historyRecordType[] {
+    get records(): historyRecordType[] {
         return JSON.parse(localStorage.getItem('history') ?? '[]');
     }
-    set history(value: historyRecordType[]) {
+    set records(value: historyRecordType[]) {
         localStorage.setItem('history', JSON.stringify(value));
     }
 
@@ -23,12 +23,12 @@ export class History implements IHistory {
             })),
             score,
         }
-        const newHistory: historyRecordType[] = this.history;
-        newHistory.push(newHistoryRecord);
-        if (newHistory.length > 3) newHistory.shift();
-        this.history = newHistory;
+        const newRecords: historyRecordType[] = this.records;
+        newRecords.push(newHistoryRecord);
+        if (newRecords.length > 3) newRecords.shift();
+        this.records = newRecords;
     }
     pop(): historyRecordType | undefined {
-        return this.history.pop();
+        return this.records.pop();
     }
 }
