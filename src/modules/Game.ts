@@ -120,7 +120,7 @@ export class Game implements IGame {
         this.updateBlocks();
         this.addNewBlock();
         requestAnimationFrame(this.handleAnimation.bind(this));
-        this.history.push({grid: this.grid, score: this.score});
+        if(this.grid.length > 1) this.history.push({grid: this.grid, score: this.score});
         this.updateInterface();
     }
     checkErrors(): boolean {
@@ -186,18 +186,24 @@ export class Game implements IGame {
         }
     }
     updateInterface(): void {
-        const {score, bestScore} = this.interfaceElements;
+        const {score, bestScore, undoButton} = this.interfaceElements;
         score.textContent = this.score.toString();
         bestScore.textContent = this.history.bestScore.toString();
+        undoButton.disabled = this.history.size < 2;
     }
     loadStateFromHistory(): void {
-        this.grid = this.history.lastRecord.grid.map(gridItem => {
+        const {lastRecord} = this.history;
+        if(!lastRecord) return;
+        this.grid = lastRecord.grid.map(gridItem => {
             return new GridBlock({game: this, value: gridItem.value, slot: gridItem.slot});
         });
-        this.score = this.history.lastRecord.score;
+        this.score = lastRecord.score;
         requestAnimationFrame(this.handleAnimation.bind(this));
         this.updateInterface();
     }
-    rollBack(): void {}
+    undoLastMove(): void {
+        this.history.pop();
+        this.loadStateFromHistory();
+    }
     handleGameOver(): void {}
 }

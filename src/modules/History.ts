@@ -17,7 +17,7 @@ export class History implements IHistory {
     set records(value: historyRecordType[]) {
         localStorage.setItem('history', JSON.stringify(value));
     }
-    get lastRecord(): historyRecordType {
+    get lastRecord(): historyRecordType | undefined {
         return this.records[this.records.length - 1];
     }
 
@@ -31,10 +31,10 @@ export class History implements IHistory {
         }
         const newRecords: historyRecordType[] = this.records;
         newRecords.push(newHistoryRecord);
-        if (newRecords.length > 3) newRecords.shift();
+        if (newRecords.length > 4) newRecords.shift();
         this.records = newRecords;
     }
-    pop(): historyRecordType | undefined {
-        return this.records.pop();
+    pop(): void {
+        this.records = this.records.slice(0, -1);
     }
 }

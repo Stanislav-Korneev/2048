@@ -36,6 +36,7 @@ export type gameConfigType = {
 export type interfaceElementsType = {
     score: HTMLSpanElement,
     bestScore: HTMLSpanElement,
+    undoButton: HTMLButtonElement,
 }
 
 export interface IGame {
@@ -57,7 +58,7 @@ export interface IGame {
     addNewBlock: () => void
     handleAnimation: (timestamp: number) => void
     updateInterface: () => void
-    rollBack: () => void
+    undoLastMove: () => void
     handleGameOver: () => void
 }
 
@@ -92,6 +93,7 @@ export interface IHistory {
     size: number
     bestScore: number
     records: historyRecordType[]
+    lastRecord: historyRecordType | undefined
     push: ({grid, score}: {grid: gridType, score: number}) => void
-    pop: () => historyRecordType | undefined
+    pop: () => void
 }

@@ -19,6 +19,7 @@ const bestScore: HTMLSpanElement = document.getElementById('best-score') as HTML
 const interfaceElements: interfaceElementsType = {
     score,
     bestScore,
+    undoButton,
 }
 
 // get game config depending on the device
