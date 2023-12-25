@@ -38,6 +38,7 @@ export type interfaceElementsType = {
     bestScore: HTMLSpanElement
     undoButton: HTMLButtonElement
     newGameButton: HTMLButtonElement
+    howToPlayButton: HTMLButtonElement
 }
 
 export interface IGame {
