@@ -15,6 +15,8 @@ const DOMElements: DOMElementsType = {
     undoButton: document.getElementById('undo-button') as HTMLButtonElement,
     newGameButton: document.getElementById('new-game-button') as HTMLButtonElement,
     howToPlayButton: document.getElementById('how-to-play-button') as HTMLButtonElement,
+    dialog: document.getElementById('dialog') as HTMLDivElement,
+    dialogButton: document.getElementById('dialog-button') as HTMLButtonElement,
 }
 
 DOMElements.canvas.width = config.canvasSize;

@@ -24,6 +24,12 @@ export type historyRecordType = {
     score: number
     grid: historyRecordGridType[]
 }
+export type dialogType = 'howToPlay' | 'victory' | 'defeat'
+export type dialogDataType = {
+    title: string
+    textContent?: string
+    buttonText: string
+}
 export type gameConfigType = {
     canvasSize: canvasSizeType
     gridBlockSize: gridBlockSizeType
@@ -32,6 +38,9 @@ export type gameConfigType = {
         duration: number
         deleteModifier: number
         pulseModifier: number
+    }
+    dialogData: {
+        [x in dialogType]: dialogDataType
     }
 }
 export type DOMElementsType = {
@@ -42,6 +51,8 @@ export type DOMElementsType = {
     undoButton: HTMLButtonElement
     newGameButton: HTMLButtonElement
     howToPlayButton: HTMLButtonElement
+    dialog: HTMLDivElement
+    dialogButton: HTMLButtonElement
 }
 
 export interface IGame {
@@ -63,7 +74,7 @@ export interface IGame {
     handleAnimation: (timestamp: number) => void
     undoLastMove: () => void
     startNewGame: () => void
-    handleGameOver: () => void
+    handleGameOver: (hasWon: boolean) => void
 }
 
 export interface IGridBlock {
@@ -105,10 +116,16 @@ export interface IHistory {
 export interface IInterface {
     game: Game
     DOMElements: DOMElementsType
-    ctx: CanvasRenderingContext2D
+    dialog: dialogType
 
     update: () => void
     clearCanvas: () => void
     drawBlock: (gridBlock: GridBlock) => void
+    setDialogData: () => void
+    openDialog: () => void
+    closeDialog: () => void
+    handleHowToPlayButton: () => void
+    handleDialogueButton: () => void
+    handleKeyUp: (e: KeyboardEvent) => void
     setEventListeners: () => void
 }

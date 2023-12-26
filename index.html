@@ -15,7 +15,14 @@
       <span id="best-score"></span>
     </div>
     <button id="new-game-button">new game</button>
-    <canvas id="game-canvas"></canvas>
+    <div id="play-field">
+      <canvas id="game-canvas"></canvas>
+      <div id="dialog" class="slide-out">
+        <span id="title"></span>
+        <span id="text-content"></span>
+        <button id="dialog-button"></button>
+      </div>
+    </div>
     <button id="undo-button">undo</button>
     <button id="how-to-play-button">how to play</button>
     <script type="module" src="/src/main.ts"></script>
