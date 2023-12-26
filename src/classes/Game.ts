@@ -1,36 +1,31 @@
 import {
     directionType,
+    DOMElementsType,
     gameConfigType,
     gridType,
     IGame,
-    interfaceElementsType,
     slotType,
-} from "./typesAndInterfaces.ts";
+} from "../helpers/typesAndInterfaces.ts";
 import GridBlock from "./GridBlock.ts";
 import {History} from "./History.ts";
+import {Interface} from "./Interface.ts";
 export class Game implements IGame {
     private readonly _config: gameConfigType
-    private readonly _ctx: CanvasRenderingContext2D
-    private readonly _tileSprite: HTMLImageElement
-    private readonly _interfaceElements: interfaceElementsType
     private readonly _availableSlots: slotType[]
     private readonly _history: History
+    private readonly _interface: Interface
     private _grid: gridType
     private _score: number
     private _moveDirection: directionType
     private _prevFrameTime: number
 
-    constructor({config, ctx, tileSprite, interfaceElements}: {
+    constructor({config, DOMElements}: {
         config: gameConfigType,
-        ctx: CanvasRenderingContext2D,
-        tileSprite: HTMLImageElement
-        interfaceElements: interfaceElementsType
+        DOMElements: DOMElementsType,
     }) {
         this._config = config;
-        this._ctx = ctx;
-        this._tileSprite = tileSprite;
-        this._interfaceElements = interfaceElements
         this._history = new History();
+        this._interface = new Interface({game: this, DOMElements});
         this._grid = [];
         this._score = 0;
         this._moveDirection = '';
@@ -46,14 +41,8 @@ export class Game implements IGame {
     get config(): gameConfigType {
         return this._config;
     }
-    get ctx(): CanvasRenderingContext2D {
-        return this._ctx;
-    }
-    get tileSprite(): HTMLImageElement {
-        return this._tileSprite;
-    }
-    get interfaceElements(): interfaceElementsType {
-        return this._interfaceElements;
+    get interface(): Interface {
+        return this._interface;
     }
     get availableSlots(): slotType[] {
         return this._availableSlots.filter(availableSlot => {
@@ -90,8 +79,7 @@ export class Game implements IGame {
         this._prevFrameTime = value;
     }
 
-    // auxiliary getters dependant on class properties
-    get parsedRows() {
+    get parsedRows(): GridBlock[][] {
         // so here we parse all our gridItems in 2d array.
         // if we move left or right - the movement axis is 'X'. So block's coordinate on 'X' axis
         // will be 'mainPos' and 'secondaryPos' will be on 'Y' axis.
@@ -121,7 +109,7 @@ export class Game implements IGame {
         this.addNewBlock();
         requestAnimationFrame(this.handleAnimation.bind(this));
         if(this.grid.length > 1) this.history.push({grid: this.grid, score: this.score});
-        this.updateInterface();
+        this.interface.update();
     }
     checkErrors(): boolean {
         return this.grid.length !== 16;
@@ -172,7 +160,7 @@ export class Game implements IGame {
         this.grid.push(newBlock);
     }
     handleAnimation(timestamp: number): void {
-        this.ctx.clearRect(0, 0, this.config.canvasSize, this.config.canvasSize);
+        this.interface.clearCanvas();
         if(this.prevFrameTime === 0) this.prevFrameTime = timestamp;
         const stepDuration: number = (timestamp - this.prevFrameTime) / (this.config.animationOptions.duration);
 
@@ -185,12 +173,6 @@ export class Game implements IGame {
             this.prevFrameTime = 0;
         }
     }
-    updateInterface(): void {
-        const {score, bestScore, undoButton} = this.interfaceElements;
-        score.textContent = this.score.toString();
-        bestScore.textContent = this.history.bestScore.toString();
-        undoButton.disabled = this.history.size < 2;
-    }
     loadStateFromHistory(): void {
         const {lastRecord} = this.history;
         if(!lastRecord) return;
@@ -199,7 +181,7 @@ export class Game implements IGame {
         });
         this.score = lastRecord.score;
         requestAnimationFrame(this.handleAnimation.bind(this));
-        this.updateInterface();
+        this.interface.update();
     }
     undoLastMove(): void {
         this.history.pop();
@@ -207,6 +189,7 @@ export class Game implements IGame {
     }
     startNewGame(): void {
         this.history.clearRecords();
+        this.score = 0;
         this.grid = [];
         this.init();
     }

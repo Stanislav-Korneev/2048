@@ -5,7 +5,7 @@ import {
     gridBlockValueType,
     IGridBlock,
     slotType
-} from "./typesAndInterfaces.ts";
+} from "../helpers/typesAndInterfaces.ts";
 import {Game} from "./Game.ts";
 
 export default class GridBlock implements IGridBlock {
@@ -135,7 +135,7 @@ export default class GridBlock implements IGridBlock {
         if(this.animationStatus.has('delete')) this.handleDelete(fadePower);
         if(this.animationStatus.has('move')) this.handleMove(shiftDistance);
         if(this.animationStatus.has('pulse')) this.handlePulse(scale);
-        this.draw();
+        this.game.interface.drawBlock(this);
     }
     calculateAnimationStep(stepDuration: number): {fadePower: number, shiftDistance: number, scale: number} {
         const {deleteModifier, pulseModifier} = this.game.config.animationOptions;
@@ -200,10 +200,6 @@ export default class GridBlock implements IGridBlock {
             this.animationStatus.delete('pulse');
             this.increaseInSize = true;
         }
-    }
-    draw(): void {
-        this.game.ctx.globalAlpha = this.opacity;
-        this.game.ctx.drawImage(this.game.tileSprite, this.tileSpritePos, 0, 268, 270, this.posX, this.posY, this.currentSize, this.currentSize);
     }
     selfDestruct(): void {
         this.game.grid.splice(this.game.grid.indexOf(this), 1);

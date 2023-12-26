@@ -1,6 +1,7 @@
-import GridBlock from "./GridBlock.ts";
-import {Game} from "./Game.ts";
-import {History} from "./History.ts";
+import GridBlock from "../classes/GridBlock.ts";
+import {Game} from "../classes/Game.ts";
+import {History} from "../classes/History.ts";
+import {Interface} from "../classes/Interface.ts";
 
 export type deviceSizeType = 's' | 'l';
 export type canvasSizeType = 290 | 500
@@ -33,7 +34,9 @@ export type gameConfigType = {
         pulseModifier: number
     }
 }
-export type interfaceElementsType = {
+export type DOMElementsType = {
+    canvas: HTMLCanvasElement
+    tileSprite: HTMLImageElement
     score: HTMLSpanElement
     bestScore: HTMLSpanElement
     undoButton: HTMLButtonElement
@@ -43,11 +46,10 @@ export type interfaceElementsType = {
 
 export interface IGame {
     config: gameConfigType
-    ctx: CanvasRenderingContext2D
-    tileSprite: HTMLImageElement
     availableSlots: slotType[]
-    grid: gridType
     history: History
+    interface: Interface
+    grid: gridType
     score: number
     moveDirection: directionType
     prevFrameTime: number
@@ -59,7 +61,6 @@ export interface IGame {
     updateBlockData: ({gridBlock, prevGridBlock}: {gridBlock: GridBlock, prevGridBlock: GridBlock}) => void
     addNewBlock: () => void
     handleAnimation: (timestamp: number) => void
-    updateInterface: () => void
     undoLastMove: () => void
     startNewGame: () => void
     handleGameOver: () => void
@@ -88,7 +89,6 @@ export interface IGridBlock {
     handleDelete: (fadePower: number) => void
     handleMove: (shiftDistance: number) => void
     handlePulse: (scale: number) => void
-    draw: () => void
     selfDestruct: () => void
 }
 
@@ -97,6 +97,18 @@ export interface IHistory {
     bestScore: number
     records: historyRecordType[]
     lastRecord: historyRecordType | undefined
+
     push: ({grid, score}: {grid: gridType, score: number}) => void
     pop: () => void
+}
+
+export interface IInterface {
+    game: Game
+    DOMElements: DOMElementsType
+    ctx: CanvasRenderingContext2D
+
+    update: () => void
+    clearCanvas: () => void
+    drawBlock: (gridBlock: GridBlock) => void
+    setEventListeners: () => void
 }

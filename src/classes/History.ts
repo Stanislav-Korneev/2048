@@ -1,4 +1,4 @@
-import {gridType, historyRecordType, IHistory} from "./typesAndInterfaces.ts";
+import {gridType, historyRecordType, IHistory} from "../helpers/typesAndInterfaces.ts";
 
 export class History implements IHistory {
     get size(): number {
