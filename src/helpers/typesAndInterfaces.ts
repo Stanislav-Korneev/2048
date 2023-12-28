@@ -123,6 +123,7 @@ export interface IHistory {
 
     push: ({grid, score}: {grid: gridType, score: number}) => void
     pop: () => void
+    clearRecords: () => void
 }
 
 export interface IInterface {
