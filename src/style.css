@@ -178,3 +178,36 @@ button:active:not(:disabled) {
     display: none;
   }
 }
+
+@media (max-device-width: 768px) {
+
+  #score-panel {
+    margin-top: 10px;
+  }
+
+  #dialog {
+    padding: 10px 20px;
+  }
+
+  #dialog-title {
+    font-size: 18px;
+  }
+
+  #dialog-text-content {
+    margin: 0;
+    font-size: 16px;
+  }
+
+  #dialog-button {
+    flex-shrink: 0;
+    margin: 20px;
+    width: 140px;
+    height: 46px;
+  }
+
+  #how-to-play-button {
+    width: 260px;
+    height: 32px;
+    padding-bottom: 4px;
+  }
+}
