@@ -3,27 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Lato">
     <title>2048</title>
   </head>
   <body>
-    <div>
-      <span>score</span>
-      <span id="score"></span>
+    <div id="score-panel">
+      <div class="score-block">
+        <span class="score-title">Score</span>
+        <span id="score" class="score-value"></span>
+      </div>
+      <div class="score-block">
+        <span class="score-title">Best</span>
+        <span id="best-score" class="score-value"></span>
+      </div>
     </div>
-    <div>
-      <span>best</span>
-      <span id="best-score"></span>
-    </div>
-    <button id="new-game-button">new game</button>
+    <button id="new-game-button">New Game</button>
     <div id="play-field">
       <canvas id="game-canvas"></canvas>
       <div id="dialog" class="slide-out">
-        <span id="title"></span>
-        <span id="text-content"></span>
+        <span id="dialog-title"></span>
+        <span id="dialog-text-content"></span>
         <button id="dialog-button"></button>
       </div>
     </div>
-    <button id="undo-button">undo</button>
+    <button id="undo-button">
+      <img src="src/img/undo_arrow.png" alt="" width="24px" height="20px">&nbsp;&nbsp;Undo</button>
     <button id="how-to-play-button">how to play</button>
     <script type="module" src="/src/main.ts"></script>
     <img style="display: none" id="tiles_sprite" src="src/img/tiles_sprite.png" alt="tiles_sprite">

@@ -12,15 +12,15 @@
       "howToPlay": {
         "title": "How to play",
         "textContent": "Slide numbered tiles using arrows or swiping. Same tiles merge and add up. Each turn new tiles with 2 or 4 appear randomly. You win if you make a tile with 2048",
-        "buttonText": "continue"
+        "buttonText": "Continue"
       },
       "victory": {
-        "title": "you've won",
-        "buttonText": "continue"
+        "title": "You Win",
+        "buttonText": "Continue"
       },
       "defeat": {
-        "title": "you've lost",
-        "buttonText": "retry"
+        "title": "You Lose",
+        "buttonText": "Retry"
       }
     }
   },
@@ -37,15 +37,15 @@
       "howToPlay": {
         "title": "How to play",
         "textContent": "Slide numbered tiles using arrows or swiping. Same tiles merge and add up. Each turn new tiles with 2 or 4 appear randomly. You win if you make a tile with 2048",
-        "buttonText": "continue"
+        "buttonText": "Continue"
       },
       "victory": {
-        "title": "you've won",
-        "buttonText": "continue"
+        "title": "You Win",
+        "buttonText": "Continue"
       },
       "defeat": {
-        "title": "you've lost",
-        "buttonText": "retry"
+        "title": "You Lose",
+        "buttonText": "Retry"
       }
     }
   }

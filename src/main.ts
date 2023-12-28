@@ -18,6 +18,7 @@ const DOMElements: DOMElementsType = {
     dialogButton: document.getElementById('dialog-button') as HTMLButtonElement,
 }
 
+document.getElementById('score-panel')!.style.width = `${config.canvasSize}px`;
 DOMElements.canvas.width = config.canvasSize;
 DOMElements.canvas.height = config.canvasSize;
 
