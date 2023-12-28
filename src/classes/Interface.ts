@@ -107,6 +107,7 @@ export class Interface implements IInterface {
             ['ArrowRight', 'right'],
             ['ArrowLeft', 'left'],
         ]);
+        if(keyMap.has(e.code)) e.preventDefault();
         if(keyMap.has(e.code) && !this.inputIsBlocked) {
             this.inputIsBlocked = true;
             this.game.moveDirection = keyMap.get(e.code)!;
@@ -128,6 +129,6 @@ export class Interface implements IInterface {
         undoButton.addEventListener('click', (): void => this.game.undoLastMove());
         howToPlayButton.addEventListener('click', (): void => this.handleHowToPlayButton());
         dialogButton.addEventListener('click', () => this.handleDialogueButton());
-        document.addEventListener('keyup', (e: KeyboardEvent): void => this.handleKeyUp(e));
+        document.addEventListener('keydown', (e: KeyboardEvent): void => this.handleKeyUp(e));
     }
 }
