@@ -3,7 +3,6 @@ import {Game} from "./classes/Game.ts";
 import {deviceSizeType, DOMElementsType, gameConfigType} from "./helpers/typesAndInterfaces.ts";
 import gameConfig from "./helpers/gameConfig.json";
 
-// get game config depending on the device
 const deviceSize: deviceSizeType = window.screen.width > 768 ? 'l' : 's';
 const config: gameConfigType = gameConfig[deviceSize] as gameConfigType;
 

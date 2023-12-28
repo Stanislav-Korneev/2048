@@ -24,7 +24,7 @@ export type historyRecordType = {
     score: number
     grid: historyRecordGridType[]
 }
-export type dialogType = 'howToPlay' | 'victory' | 'defeat'
+export type dialogType = '' | 'howToPlay' | 'victory' | 'defeat'
 export type dialogDataType = {
     title: string
     textContent?: string
@@ -64,14 +64,21 @@ export interface IGame {
     score: number
     moveDirection: directionType
     prevFrameTime: number
+    gameContinuesAfterVictory: boolean
+
+    // computed properties
+    parsedRows: GridBlock[][]
+    isNextMovePossible: boolean
+    has2048: boolean
 
     init: () => void
     makeMove: () => void
-    checkErrors: () => void
-    updateBlocks: () => void
+    updateBlocks: () => boolean
     updateBlockData: ({gridBlock, prevGridBlock}: {gridBlock: GridBlock, prevGridBlock: GridBlock}) => void
+    checkForMovement: (gridBlock: GridBlock) => boolean
     addNewBlock: () => void
     handleAnimation: (timestamp: number) => void
+    loadStateFromHistory: () => void
     undoLastMove: () => void
     startNewGame: () => void
     handleGameOver: (hasWon: boolean) => void
@@ -116,7 +123,8 @@ export interface IHistory {
 export interface IInterface {
     game: Game
     DOMElements: DOMElementsType
-    dialog: dialogType
+    dialogName: dialogType
+    inputIsBlocked: boolean
 
     update: () => void
     clearCanvas: () => void

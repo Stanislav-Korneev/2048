@@ -6,7 +6,8 @@ import GridBlock from "./GridBlock.ts";
 export class Interface implements IInterface {
     private readonly _game: Game
     private readonly _DOMElements: DOMElementsType
-    private _dialog: dialogType
+    private _dialogName: dialogType
+    private _inputIsBlocked: boolean
 
     constructor({game, DOMElements}: {
         game: Game
@@ -14,8 +15,8 @@ export class Interface implements IInterface {
     }) {
         this._game = game;
         this._DOMElements = DOMElements;
-        // default and most probable value just to make things a little more simple
-        this._dialog = 'defeat';
+        this._dialogName = '';
+        this._inputIsBlocked = false;
         this.setEventListeners();
     }
 
@@ -25,17 +26,24 @@ export class Interface implements IInterface {
     get DOMElements(): DOMElementsType {
         return this._DOMElements;
     }
+    get dialogName(): dialogType {
+        return this._dialogName;
+    }
+    set dialogName(value: dialogType) {
+        this._dialogName = value;
+    }
+    get inputIsBlocked(): boolean {
+        return this._inputIsBlocked;
+    }
+    set inputIsBlocked(value: boolean) {
+        this._inputIsBlocked = value;
+    }
     get ctx(): CanvasRenderingContext2D {
         return this.DOMElements.canvas.getContext('2d')!;
     }
-    get dialog(): dialogType {
-        return this._dialog;
-    }
-    set dialog(value: dialogType) {
-        this._dialog = value;
-    }
-    get dialogData(): dialogDataType {
-        return this.game.config.dialogData[this.dialog];
+    get dialogData(): dialogDataType | undefined {
+        if(this.dialogName === '') return undefined;
+        return this.game.config.dialogData[this.dialogName];
     }
 
     update(): void {
@@ -56,6 +64,7 @@ export class Interface implements IInterface {
     }
 
     setDialogData(): void {
+        if(!this.dialogData) return;
         const [title, textContent, dialogButton] = this.DOMElements.dialog.children;
         title.textContent = this.dialogData.title;
         textContent.textContent = this.dialogData.textContent ?? '';
@@ -63,27 +72,39 @@ export class Interface implements IInterface {
     }
 
     openDialog(): void {
-        const {dialog} = this.DOMElements;
+        const {dialog, undoButton, howToPlayButton} = this.DOMElements;
         // by default opacity is 0 to hide slide-out animation
         dialog.style.opacity = '1';
         dialog.classList.remove('slide-out');
-        dialog.classList.add('slide-in')
+        dialog.classList.add('slide-in');
+        undoButton.disabled = true;
+        if(this.dialogName !== 'howToPlay') howToPlayButton.disabled = true;
+        this.inputIsBlocked = true;
     }
 
     closeDialog(): void {
-        const {dialog} = this.DOMElements;
+        const {dialog, undoButton, howToPlayButton} = this.DOMElements;
+        this.dialogName = '';
         dialog.classList.remove('slide-in');
-        dialog.classList.add('slide-out')
+        dialog.classList.add('slide-out');
+        undoButton.disabled = false;
+        howToPlayButton.disabled = false;
+        this.inputIsBlocked = false;
     }
 
     handleHowToPlayButton(): void {
-        this.dialog = 'howToPlay';
+        if(this.dialogName === 'howToPlay') {
+            this.closeDialog();
+            return;
+        }
+        this.dialogName = 'howToPlay';
         this.setDialogData();
         this.openDialog();
     }
     handleDialogueButton(): void {
-        if(this.dialog === 'defeat') this.game.startNewGame();
-        else this.closeDialog();
+        if(this.dialogName === 'defeat') this.game.startNewGame();
+        if(this.dialogName === 'victory') this.game.gameContinuesAfterVictory = true;
+        this.closeDialog();
     }
     handleKeyUp(e: KeyboardEvent): void {
         const keyMap: Map<string, directionType> = new Map([
@@ -92,7 +113,8 @@ export class Interface implements IInterface {
             ['ArrowRight', 'right'],
             ['ArrowLeft', 'left'],
         ]);
-        if(keyMap.has(e.code)) {
+        if(keyMap.has(e.code) && !this.inputIsBlocked) {
+            this.inputIsBlocked = true;
             this.game.moveDirection = keyMap.get(e.code)!;
             this.game.makeMove();
         }
@@ -111,7 +133,7 @@ export class Interface implements IInterface {
         newGameButton.addEventListener('click', (): void => this.game.startNewGame());
         undoButton.addEventListener('click', (): void => this.game.undoLastMove());
         howToPlayButton.addEventListener('click', (): void => this.handleHowToPlayButton());
-        dialogButton.addEventListener('click', () => this.handleDialogueButton())
-        document.addEventListener('keyup', (e: KeyboardEvent): void => this.handleKeyUp(e))
+        dialogButton.addEventListener('click', () => this.handleDialogueButton());
+        document.addEventListener('keyup', (e: KeyboardEvent): void => this.handleKeyUp(e));
     }
 }
