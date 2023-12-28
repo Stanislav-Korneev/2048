@@ -73,7 +73,7 @@ export default (target: HTMLElement): void => {
             keyCode = diffX > 0 ? 'ArrowRight' : 'ArrowLeft';
         }
 
-        target.dispatchEvent(new KeyboardEvent('keyup', {
+        target.dispatchEvent(new KeyboardEvent('keydown', {
             bubbles: true,
             code: keyCode,
         }))
