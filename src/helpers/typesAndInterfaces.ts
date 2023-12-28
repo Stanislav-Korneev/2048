@@ -65,8 +65,6 @@ export interface IGame {
     moveDirection: directionType
     prevFrameTime: number
     gameContinuesAfterVictory: boolean
-
-    // computed properties
     parsedRows: GridBlock[][]
     isNextMovePossible: boolean
     has2048: boolean

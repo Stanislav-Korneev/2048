@@ -245,7 +245,6 @@ export class Game implements IGame {
         this.history.bestScore = this.score;
         this.interface.update();
         this.interface.dialogName = hasWon ? 'victory' : 'defeat';
-        this.interface.setDialogData();
         this.interface.openDialog();
         if(!hasWon) this.history.clearRecords();
     }
