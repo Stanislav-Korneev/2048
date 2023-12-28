@@ -52,26 +52,23 @@ export class Interface implements IInterface {
         bestScore.textContent = this.game.history.bestScore.toString();
         undoButton.disabled = this.game.history.size < 2;
     }
-
     clearCanvas(): void {
         this.ctx.clearRect(0, 0, this.game.config.canvasSize, this.game.config.canvasSize);
     }
-
     drawBlock(gridBlock: GridBlock): void {
         const {opacity, tileSpritePos, posX, posY, currentSize} = gridBlock;
         this.ctx.globalAlpha = opacity;
         this.ctx.drawImage(this.DOMElements.tileSprite, tileSpritePos, 0, 268, 270, posX, posY, currentSize, currentSize);
     }
-
-    setDialogData(): void {
+    updateDialogData(): void {
         if(!this.dialogData) return;
         const [title, textContent, dialogButton] = this.DOMElements.dialog.children;
         title.textContent = this.dialogData.title;
         textContent.textContent = this.dialogData.textContent ?? '';
         dialogButton.textContent = this.dialogData.buttonText;
     }
-
     openDialog(): void {
+        this.updateDialogData();
         const {dialog, undoButton, howToPlayButton} = this.DOMElements;
         // by default opacity is 0 to hide slide-out animation
         dialog.style.opacity = '1';
@@ -81,7 +78,6 @@ export class Interface implements IInterface {
         if(this.dialogName !== 'howToPlay') howToPlayButton.disabled = true;
         this.inputIsBlocked = true;
     }
-
     closeDialog(): void {
         const {dialog, undoButton, howToPlayButton} = this.DOMElements;
         this.dialogName = '';
@@ -91,14 +87,12 @@ export class Interface implements IInterface {
         howToPlayButton.disabled = false;
         this.inputIsBlocked = false;
     }
-
     handleHowToPlayButton(): void {
         if(this.dialogName === 'howToPlay') {
             this.closeDialog();
             return;
         }
         this.dialogName = 'howToPlay';
-        this.setDialogData();
         this.openDialog();
     }
     handleDialogueButton(): void {

@@ -93,6 +93,13 @@ export interface IGridBlock {
     currentSize: number
     increaseInSize: boolean
     moveDistance: number
+    directionUpOrLeft: boolean
+    moveAxis: axisType
+    mainPos: gridBlockPositionType
+    secondaryPos: gridBlockPositionType
+    borderPos: gridBlockPositionType
+    neighbourSlot: slotType
+    tileSpritePos: number
 
     moveToBorderSlot: () => void
     update: (stepDuration: number) => void
@@ -123,11 +130,13 @@ export interface IInterface {
     DOMElements: DOMElementsType
     dialogName: dialogType
     inputIsBlocked: boolean
+    ctx: CanvasRenderingContext2D
+    dialogData: dialogDataType | undefined
 
     update: () => void
     clearCanvas: () => void
     drawBlock: (gridBlock: GridBlock) => void
-    setDialogData: () => void
+    updateDialogData: () => void
     openDialog: () => void
     closeDialog: () => void
     handleHowToPlayButton: () => void

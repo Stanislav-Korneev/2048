@@ -91,7 +91,6 @@ export default class GridBlock implements IGridBlock {
     set moveDistance(value: number) {
         this._moveDistance = value;
     }
-    // auxiliary getters dependant on class properties
     get directionUpOrLeft(): boolean {
         return this.game.moveDirection === 'up' || this.game.moveDirection === 'left';
     }
