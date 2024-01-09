@@ -36,6 +36,7 @@ button {
   color: #844553;
   font-size: 20px;
   font-weight: bold;
+  -webkit-tap-highlight-color: transparent;
 }
 button:active:not(:disabled) {
   transform: scale(.98);
