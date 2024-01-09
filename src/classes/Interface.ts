@@ -130,5 +130,11 @@ export class Interface implements IInterface {
         howToPlayButton.addEventListener('click', (): void => this.handleHowToPlayButton());
         dialogButton.addEventListener('click', () => this.handleDialogueButton());
         document.addEventListener('keydown', (e: KeyboardEvent): void => this.handleKeyUp(e));
+
+        // in safari fixes work of :active pseudo class
+        newGameButton.addEventListener('touchstart', () => {});
+        undoButton.addEventListener('touchstart', () => {});
+        howToPlayButton.addEventListener('touchstart', () => {});
+        dialogButton.addEventListener('touchstart', () => {});
     }
 }
