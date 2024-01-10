@@ -3,7 +3,7 @@ import {Game} from "../classes/Game.ts";
 import {History} from "../classes/History.ts";
 import {Interface} from "../classes/Interface.ts";
 
-export type deviceSizeType = 's' | 'l';
+export type deviceSizeType = 's' | 'm' | 'l';
 export type canvasSizeType = 290 | 500
 export type gridBlockSizeType = 58 | 100
 
