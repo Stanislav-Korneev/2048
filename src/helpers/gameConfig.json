@@ -2,7 +2,32 @@
   "s": {
     "canvasSize": 290,
     "gridBlockSize": 58,
-    "gridBlockPositions": [20, 84, 148, 212],
+    "gridBlockPositions": [21, 84, 148, 212],
+    "animationOptions": {
+      "duration": 150,
+      "deleteModifier": 100,
+      "pulseModifier": 20
+    },
+    "dialogData": {
+      "howToPlay": {
+        "title": "How to play",
+        "textContent": "Slide numbered tiles using arrows or swiping. Same tiles merge and add up. Each turn new tiles with 2 or 4 appear randomly. You win if you make a tile with 2048",
+        "buttonText": "Continue"
+      },
+      "victory": {
+        "title": "You Win",
+        "buttonText": "Continue"
+      },
+      "defeat": {
+        "title": "You Lose",
+        "buttonText": "Retry"
+      }
+    }
+  },
+  "m": {
+    "canvasSize": 360,
+    "gridBlockSize": 72,
+    "gridBlockPositions": [25, 105, 185, 265],
     "animationOptions": {
       "duration": 150,
       "deleteModifier": 100,
