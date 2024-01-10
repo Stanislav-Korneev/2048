@@ -57,6 +57,7 @@ export class Interface implements IInterface {
     }
     drawBlock(gridBlock: GridBlock): void {
         const {opacity, tileSpritePos, posX, posY, currentSize} = gridBlock;
+        this.ctx.imageSmoothingQuality = 'medium';
         this.ctx.globalAlpha = opacity;
         this.ctx.drawImage(this.DOMElements.tileSprite, tileSpritePos, 0, 268, 270, posX, posY, currentSize, currentSize);
     }
