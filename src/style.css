@@ -149,11 +149,11 @@ button:active:not(:disabled) {
 }
 
 .slide-in {
-  animation: slide-in 200ms ease-in forwards;
+  animation: slide-in 400ms ease-in-out forwards;
 }
 
 .slide-out {
-  animation: slide-out 200ms ease-in forwards;
+  animation: slide-out 400ms ease-in-out forwards;
 }
 
 @keyframes slide-in {
